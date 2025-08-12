@@ -129,12 +129,12 @@ main {
   gap: 6px;
   vertical-align: middle;
   margin: 0 6px;
-  flex-wrap: wrap; max-width: 100%;
+  flex-wrap: nowrap;
 }
 
 .tile {
-  width: clamp(34px, 9vw, 46px);
-  height: clamp(46px, 12vw, 58px);
+  width: 46px;
+  height: 58px;
   border-radius: 14px;
   border: 2px solid #e5e7eb;
   background: #f9fafb;
@@ -341,447 +341,473 @@ const FRY_WORDS = [
 
 /* Hand-curated starter sentences (kept; we’ll add auto-generated below) */
 const CURATED = [
-  {answer:"the", textBefore:"___ cat is sleeping on the mat", textAfter:"."},
-  {answer:"and", textBefore:"Cookies ___ milk are on the table", textAfter:"."},
-  {answer:"to", textBefore:"We walk ___ school each day", textAfter:"."},
-  {answer:"in", textBefore:"Put the toy ___ the box", textAfter:"."},
-  {answer:"is", textBefore:"The soup ___ hot", textAfter:"."},
-  {answer:"you", textBefore:"___ are my friend", textAfter:"!"},
-  {answer:"it", textBefore:"Zip up your jacket so ___ stays warm", textAfter:"."},
-  {answer:"was", textBefore:"Yesterday it ___ raining", textAfter:"."},
-  {answer:"on", textBefore:"Please keep both hands ___ the handlebars", textAfter:"."},
-  {answer:"are", textBefore:"We ___ ready to go", textAfter:"!"},
-  {answer:"with", textBefore:"I like pancakes ___ syrup", textAfter:"."},
-  {answer:"they", textBefore:"___ will come to the park", textAfter:"."},
-  {answer:"at", textBefore:"Meet me ___ the swings", textAfter:"."},
-  {answer:"this", textBefore:"___ puzzle is tricky", textAfter:"."},
-  {answer:"have", textBefore:"Do you ___ a pencil", textAfter:"?"},
-  {answer:"from", textBefore:"This letter is ___ Grandma", textAfter:"."},
-  {answer:"one", textBefore:"I saw ___ bright star", textAfter:"."},
-  {answer:"by", textBefore:"Stand ___ the door and wave", textAfter:"."},
-  {answer:"but", textBefore:"I want to play ___ it’s bedtime", textAfter:"."},
-  {answer:"what", textBefore:"___ is your favorite game", textAfter:"?"},
-  {answer:"all", textBefore:"We cleaned up ___ the blocks", textAfter:"."},
-  {answer:"we", textBefore:"___ built a tall tower", textAfter:"!"},
-  {answer:"when", textBefore:"I smile ___ I see you", textAfter:"."},
-  {answer:"can", textBefore:"I ___ tie my shoes", textAfter:"."},
-  {answer:"said", textBefore:"Mom ___ it’s story time", textAfter:"."},
-  {answer:"there", textBefore:"Look over ___ for our seats", textAfter:"."},
-  {answer:"use", textBefore:"Please ___ gentle hands", textAfter:"."},
-  {answer:"which", textBefore:"___ book should we read", textAfter:"?"},
-  {answer:"do", textBefore:"___ your best", textAfter:"!"},
-  {answer:"how", textBefore:"___ many jumps can you do", textAfter:"?"},
-  {answer:"their", textBefore:"The twins lost ___ hats", textAfter:"."},
-  {answer:"if", textBefore:"___ it rains, we’ll play inside", textAfter:"."},
-  {answer:"up", textBefore:"Climb ___ the ladder carefully", textAfter:"."},
-  {answer:"out", textBefore:"Take the trash ___", textAfter:"."},
-  {answer:"then", textBefore:"First brush, ___ rinse", textAfter:"."},
-  {answer:"so", textBefore:"It’s late, ___ let’s head home", textAfter:"."},
-  {answer:"her", textBefore:"She loves ___ pink backpack", textAfter:"."},
-  {answer:"make", textBefore:"Let’s ___ a card for Grandpa", textAfter:"."},
-  {answer:"like", textBefore:"I ___ to read before bed", textAfter:"."},
-  {answer:"into", textBefore:"Step ___ the circle", textAfter:"."},
-  {answer:"time", textBefore:"It’s ___ to get ready", textAfter:"."},
-  {answer:"has", textBefore:"Our dog ___ a waggy tail", textAfter:"."},
-  {answer:"look", textBefore:"___ both ways before crossing", textAfter:"."},
-  {answer:"more", textBefore:"May I have ___ water", textAfter:"?"},
-  {answer:"go", textBefore:"Ready, set, ___!", textAfter:""},
-  {answer:"see", textBefore:"Can you ___ the rainbow", textAfter:"?"},
-  {answer:"no", textBefore:"___ running in the hallway", textAfter:"!"},
-  {answer:"way", textBefore:"This is the ___ to the library", textAfter:"."},
-  {answer:"people", textBefore:"Many ___ helped clean the park", textAfter:"."},
-  {answer:"my", textBefore:"___ shoes light up", textAfter:"!"},
-  {answer:"first", textBefore:"Put your name ___", textAfter:"."},
-  {answer:"water", textBefore:"Drink your ___ after play", textAfter:"."},
-  {answer:"new", textBefore:"I got a ___ book today", textAfter:"."},
-  {answer:"little", textBefore:"The ___ frog can jump high", textAfter:"."},
-  {answer:"know", textBefore:"I ___ the answer", textAfter:"!"},
-  {answer:"place", textBefore:"This is our favorite ___", textAfter:"."},
-  {answer:"year", textBefore:"Happy New ___", textAfter:"!"},
-  {answer:"very", textBefore:"You did ___ well", textAfter:"!"},
-  {answer:"after", textBefore:"We’ll play ___ lunch", textAfter:"."},
-  {answer:"help", textBefore:"Please ___ me zip this", textAfter:"."},
-  {answer:"too", textBefore:"I want to play ___", textAfter:"!"},
-  {answer:"old", textBefore:"My bike is not that ___", textAfter:"."},
-  {answer:"any", textBefore:"Do you have ___ tape", textAfter:"?"},
-  {answer:"tell", textBefore:"___ me your idea", textAfter:"."},
-  {answer:"boy", textBefore:"The ___ kicks the ball", textAfter:"."},
-  {answer:"came", textBefore:"Grandpa ___ to visit", textAfter:"."},
-  {answer:"want", textBefore:"I ___ to try again", textAfter:"."},
-  {answer:"also", textBefore:"I like apples and bananas ___", textAfter:"."},
-  {answer:"three", textBefore:"We have ___ cookies", textAfter:"."},
-  {answer:"does", textBefore:"What ___ the sign say", textAfter:"?"},
-  {answer:"well", textBefore:"You read that very ___", textAfter:"!"},
-  {answer:"here", textBefore:"Come sit right ___", textAfter:"."},
-  {answer:"why", textBefore:"___ is the sky blue", textAfter:"?"},
-  {answer:"ask", textBefore:"___ a question kindly", textAfter:"."},
-  {answer:"read", textBefore:"Let’s ___ one more page", textAfter:"."},
-  {answer:"need", textBefore:"Do you ___ a snack", textAfter:"?"},
-  {answer:"home", textBefore:"We are going ___ now", textAfter:"."},
-  {answer:"try", textBefore:"It’s okay—just ___ again", textAfter:"."},
-  {answer:"again", textBefore:"Wow! Do that trick ___", textAfter:"!"},
-  {answer:"run", textBefore:"Don’t ___ by the pool", textAfter:"."},
-  {answer:"children", textBefore:"All the ___ lined up", textAfter:"."},
-  {answer:"car", textBefore:"Buckle your seat in the ___", textAfter:"."},
-  {answer:"night", textBefore:"Good ___, sleep tight", textAfter:"."},
-  {answer:"walk", textBefore:"Let’s ___ the dog", textAfter:"."},
-  {answer:"white", textBefore:"Snow looks so ___", textAfter:"."}
+  {answer:"but", textBefore:"He ran fast", textAfter:"fell down."},
+  {answer:"world", textBefore:"We learn about the", textAfter:"."},
+  {answer:"give", textBefore:"", textAfter:"me five!"},
+  {answer:"it", textBefore:"", textAfter:"is time to go."},
+  {answer:"through", textBefore:"Walk", textAfter:"the tunnel."},
+  {answer:"before", textBefore:"Brush teeth", textAfter:"bed."},
+  {answer:"keep", textBefore:"Please", textAfter:"trying."},
+  {answer:"during", textBefore:"No talking", textAfter:"the test."},
+  {answer:"both", textBefore:"", textAfter:"hands on the rail."},
+  {answer:"from", textBefore:"We walked home", textAfter:"school."},
+  {answer:"our", textBefore:"We love", textAfter:"school."},
+  {answer:"page", textBefore:"Turn the", textAfter:"."},
+  {answer:"up", textBefore:"Climb", textAfter:"the ladder."},
+  {answer:"low", textBefore:"Keep the sound", textAfter:"."},
+  {answer:"over", textBefore:"Jump", textAfter:"the puddle."},
+  {answer:"our", textBefore:"", textAfter:"class won a prize."},
+  {answer:"see", textBefore:"Can you", textAfter:"the rainbow?"},
+  {answer:"page", textBefore:"Find the", textAfter:"with the picture."},
+  {answer:"may", textBefore:"", textAfter:"I have a snack?"},
+  {answer:"their", textBefore:"", textAfter:"team played well."},
+  {answer:"before", textBefore:"Wash hands", textAfter:"dinner."},
+  {answer:"room", textBefore:"The", textAfter:"is quiet."},
+  {answer:"may", textBefore:"You", textAfter:"go outside."},
+  {answer:"give", textBefore:"Please", textAfter:"the note to Mom."},
+  {answer:"on", textBefore:"Keep your hands", textAfter:"the rail."},
+  {answer:"great", textBefore:"You made a", textAfter:"choice."},
+  {answer:"horse", textBefore:"The", textAfter:"runs fast."},
+  {answer:"hand", textBefore:"Raise your", textAfter:"."},
+  {answer:"read", textBefore:"We", textAfter:"together every night."},
+  {answer:"sun", textBefore:"Do not look at the", textAfter:"."},
+  {answer:"during", textBefore:"Be quiet", textAfter:"the show."},
+  {answer:"home", textBefore:"I like to be at", textAfter:"."},
+  {answer:"these", textBefore:"Put", textAfter:"papers away."},
+  {answer:"from", textBefore:"This note is", textAfter:"Mom."},
+  {answer:"to", textBefore:"Go", textAfter:"the library."},
+  {answer:"he", textBefore:"", textAfter:"is my brother."},
+  {answer:"low", textBefore:"The cloud is", textAfter:"."},
+  {answer:"start", textBefore:"", textAfter:"the game."},
+  {answer:"story", textBefore:"Read the", textAfter:"out loud."},
+  {answer:"table", textBefore:"We eat at the", textAfter:"."},
+  {answer:"was", textBefore:"It", textAfter:"sunny yesterday."},
+  {answer:"music", textBefore:"The", textAfter:"is very soft."},
+  {answer:"letter", textBefore:"Write one", textAfter:"here."},
+  {answer:"mother", textBefore:"My", textAfter:"reads to me."},
+  {answer:"i", textBefore:"", textAfter:"am your friend."},
+  {answer:"early", textBefore:"It is", textAfter:"in the morning."},
+  {answer:"little", textBefore:"He has a", textAfter:"car."},
+  {answer:"should", textBefore:"You", textAfter:"say thank you."},
+  {answer:"an", textBefore:"He ate", textAfter:"apple at lunch."},
+  {answer:"after", textBefore:"We will play", textAfter:"lunch."},
+  {answer:"or", textBefore:"Should we read now", textAfter:"later?"},
+  {answer:"father", textBefore:"I went with my", textAfter:"to the store."},
+  {answer:"in", textBefore:"We sit", textAfter:"the shade."},
+  {answer:"friend", textBefore:"My", textAfter:"is kind."},
+  {answer:"white", textBefore:"I saw a", textAfter:"bird."},
+  {answer:"above", textBefore:"The plane flew", textAfter:"the city."},
+  {answer:"tell", textBefore:"", textAfter:"me your idea."},
+  {answer:"us", textBefore:"Read to", textAfter:"tonight."},
+  {answer:"you", textBefore:"", textAfter:"can try again."},
+  {answer:"his", textBefore:"", textAfter:"hat is red."},
+  {answer:"off", textBefore:"Take", textAfter:"your shoes."},
+  {answer:"little", textBefore:"The", textAfter:"bird can fly."},
+  {answer:"make", textBefore:"Let’s", textAfter:"a card for Grandpa."},
+  {answer:"it", textBefore:"", textAfter:"looks sunny today."},
+  {answer:"other", textBefore:"Use the", textAfter:"marker."},
+  {answer:"friend", textBefore:"I will help my", textAfter:"."},
+  {answer:"write", textBefore:"", textAfter:"your name."},
+  {answer:"come", textBefore:"Can you", textAfter:"to my desk?"},
+  {answer:"if", textBefore:"", textAfter:"it rains, we will stay in."},
+  {answer:"its", textBefore:"The dog wagged", textAfter:"tail."},
+  {answer:"we", textBefore:"", textAfter:"are ready to start."},
+  {answer:"story", textBefore:"That", textAfter:"is funny."},
+  {answer:"door", textBefore:"Please open the", textAfter:"."},
+  {answer:"learn", textBefore:"", textAfter:"to spell this word."},
+  {answer:"find", textBefore:"Can you", textAfter:"the page?"},
+  {answer:"boy", textBefore:"The", textAfter:"kicks the ball."},
+  {answer:"me", textBefore:"Please help", textAfter:"."},
+  {answer:"best", textBefore:"You are my", textAfter:"friend."},
+  {answer:"door", textBefore:"Close the", textAfter:"softly."},
+  {answer:"hand", textBefore:"Wash your", textAfter:"before lunch."},
+  {answer:"city", textBefore:"The", textAfter:"is very big."},
+  {answer:"more", textBefore:"I want", textAfter:"water."},
+  {answer:"red", textBefore:"She has a", textAfter:"ball."},
+  {answer:"car", textBefore:"Get in the", textAfter:"."},
+  {answer:"am", textBefore:"I", textAfter:"ready to read."},
+  {answer:"but", textBefore:"I want to play", textAfter:"it is late."},
+  {answer:"run", textBefore:"I like to", textAfter:"fast."},
+  {answer:"color", textBefore:"Blue is my favorite", textAfter:"."},
+  {answer:"world", textBefore:"The", textAfter:"is big."},
+  {answer:"plant", textBefore:"A new", textAfter:"is growing."},
+  {answer:"ask", textBefore:"You can", textAfter:"for help."},
+  {answer:"carry", textBefore:"Can you", textAfter:"this bag?"},
+  {answer:"each", textBefore:"", textAfter:"child gets a turn."},
+  {answer:"near", textBefore:"We live", textAfter:"the park."},
+  {answer:"we", textBefore:"", textAfter:"will clean up."},
+  {answer:"make", textBefore:"We", textAfter:"a big tower."},
+  {answer:"must", textBefore:"You", textAfter:"wear a helmet."},
+  {answer:"another", textBefore:"Please pick", textAfter:"book."},
+  {answer:"some", textBefore:"I need", textAfter:"help."},
+  {answer:"around", textBefore:"Run", textAfter:"the cones."},
+  {answer:"below", textBefore:"The fish swim", textAfter:"the dock."},
+  {answer:"follow", textBefore:"Please", textAfter:"the rules."},
+  {answer:"few", textBefore:"A", textAfter:"kids were absent."},
+  {answer:"my", textBefore:"", textAfter:"shoes light up."},
+  {answer:"the", textBefore:"I saw", textAfter:"moon last night."},
+  {answer:"are", textBefore:"You", textAfter:"very kind."},
+  {answer:"river", textBefore:"The", textAfter:"is wide."},
+  {answer:"write", textBefore:"Can you", textAfter:"a sentence?"},
+  {answer:"try", textBefore:"Let’s", textAfter:"this one."},
+  {answer:"close", textBefore:"Please", textAfter:"your eyes."},
+  {answer:"bring", textBefore:"", textAfter:"your book to class."},
+  {answer:"get", textBefore:"I will", textAfter:"my pencil."},
+  {answer:"high", textBefore:"We climbed the", textAfter:"hill."},
+  {answer:"should", textBefore:"We", textAfter:"start now."},
+  {answer:"own", textBefore:"Bring your", textAfter:"pencil."},
+  {answer:"black", textBefore:"The cat is", textAfter:"."},
+  {answer:"my", textBefore:"", textAfter:"backpack is blue."},
+  {answer:"each", textBefore:"Read", textAfter:"word slowly."},
+  {answer:"short", textBefore:"It is a", textAfter:"line."},
+  {answer:"school", textBefore:"Walk to", textAfter:"with me."},
+  {answer:"change", textBefore:"The leaves", textAfter:"color."},
+  {answer:"book", textBefore:"This", textAfter:"is new."},
+  {answer:"so", textBefore:"It is late,", textAfter:"we will go home."},
+  {answer:"on", textBefore:"The book is", textAfter:"the table."},
+  {answer:"was", textBefore:"The game", textAfter:"fun."},
+  {answer:"own", textBefore:"I built my", textAfter:"tower."},
+  {answer:"in", textBefore:"Put the toy", textAfter:"the box."},
+  {answer:"every", textBefore:"We practice", textAfter:"day."},
+  {answer:"white", textBefore:"The snow is", textAfter:"."},
+  {answer:"i", textBefore:"", textAfter:"like to read."},
+  {answer:"them", textBefore:"I met", textAfter:"at the playground."},
+  {answer:"at", textBefore:"Meet me", textAfter:"the park."},
+  {answer:"birds", textBefore:"I see two", textAfter:"in the sky."},
+  {answer:"better", textBefore:"This plan is", textAfter:"."},
+  {answer:"family", textBefore:"I love my", textAfter:"."},
+  {answer:"before", textBefore:"Pack your bag", textAfter:"school."},
+  {answer:"paper", textBefore:"Write your name on the", textAfter:"."},
+  {answer:"her", textBefore:"Hold", textAfter:"hand."},
+  {answer:"around", textBefore:"We walked", textAfter:"the block."},
+  {answer:"he", textBefore:"", textAfter:"likes to run."},
+  {answer:"no", textBefore:"There is", textAfter:"time to waste."},
+  {answer:"change", textBefore:"", textAfter:"your seat."},
+  {answer:"after", textBefore:"Wash hands", textAfter:"play."},
+  {answer:"am", textBefore:"I", textAfter:"six years old."},
+  {answer:"mother", textBefore:"I hugged my", textAfter:"."},
+  {answer:"when", textBefore:"We line up", textAfter:"the bell rings."},
+  {answer:"high", textBefore:"The kite is", textAfter:"."},
+  {answer:"below", textBefore:"The house sits", textAfter:"the hill."},
+  {answer:"go", textBefore:"Ready, set,", textAfter:"!"},
+  {answer:"to", textBefore:"Give the ball", textAfter:"Sam."},
+  {answer:"you", textBefore:"", textAfter:"are very kind."},
+  {answer:"out", textBefore:"Take the trash", textAfter:"."},
+  {answer:"or", textBefore:"Do you want milk", textAfter:"water?"},
+  {answer:"good", textBefore:"That is a", textAfter:"idea."},
+  {answer:"look", textBefore:"", textAfter:"both ways before crossing."},
+  {answer:"us", textBefore:"Come with", textAfter:"."},
+  {answer:"when", textBefore:"Clap", textAfter:"the song ends."},
+  {answer:"through", textBefore:"Look", textAfter:"the window."},
+  {answer:"play", textBefore:"Can you", textAfter:"with me?"},
+  {answer:"point", textBefore:"Please", textAfter:"to the map."},
+  {answer:"another", textBefore:"Can I have", textAfter:"turn?"},
+  {answer:"until", textBefore:"Wait here", textAfter:"the light turns green."},
+  {answer:"real", textBefore:"Is the coin", textAfter:"?"},
+  {answer:"table", textBefore:"Put the crayons on the", textAfter:"."},
+  {answer:"is", textBefore:"The soup", textAfter:"hot."},
+  {answer:"girl", textBefore:"The", textAfter:"is reading."},
+  {answer:"him", textBefore:"I saw", textAfter:"at school."},
+  {answer:"several", textBefore:"She has", textAfter:"stickers."},
+  {answer:"red", textBefore:"The door is", textAfter:"."},
+  {answer:"off", textBefore:"Turn", textAfter:"the light."},
+  {answer:"they", textBefore:"", textAfter:"will come later."},
+  {answer:"most", textBefore:"I finished", textAfter:"of it."},
+  {answer:"so", textBefore:"It rained,", textAfter:"we stayed in."},
+  {answer:"read", textBefore:"Please", textAfter:"the book."},
+  {answer:"an", textBefore:"We saw", textAfter:"owl at the zoo."},
+  {answer:"night", textBefore:"At", textAfter:"the stars come out."},
+  {answer:"him", textBefore:"Give the ball to", textAfter:"."},
+  {answer:"learn", textBefore:"We will", textAfter:"new things."},
+  {answer:"until", textBefore:"We will stay", textAfter:"noon."},
+  {answer:"great", textBefore:"It was a", textAfter:"game."},
+  {answer:"country", textBefore:"Our", textAfter:"has many cities."},
+  {answer:"long", textBefore:"Read the", textAfter:"story."},
+  {answer:"grow", textBefore:"Children", textAfter:"each year."},
+  {answer:"under", textBefore:"We sat", textAfter:"the tree."},
+  {answer:"walk", textBefore:"Let’s", textAfter:"to class."},
+  {answer:"ask", textBefore:"", textAfter:"a question."},
+  {answer:"find", textBefore:"Let’s", textAfter:"your shoes."},
+  {answer:"across", textBefore:"Look both ways", textAfter:"the street."},
+  {answer:"she", textBefore:"", textAfter:"is my sister."},
+  {answer:"fish", textBefore:"We fed the", textAfter:"."},
+  {answer:"if", textBefore:"We can go", textAfter:"you are ready."},
+  {answer:"must", textBefore:"We", textAfter:"stop at the light."},
+  {answer:"any", textBefore:"Are there", textAfter:"snacks left?"},
+  {answer:"out", textBefore:"We went", textAfter:"to play."},
+  {answer:"walk", textBefore:"We", textAfter:"across the field."},
+  {answer:"while", textBefore:"Sit still", textAfter:"I count."},
+  {answer:"his", textBefore:"That is", textAfter:"book."},
+  {answer:"dog", textBefore:"The", textAfter:"barked loudly."},
+  {answer:"your", textBefore:"", textAfter:"coat is on the hook."},
+  {answer:"help", textBefore:"Please", textAfter:"me zip this."},
+  {answer:"any", textBefore:"Do you have", textAfter:"tape?"},
+  {answer:"big", textBefore:"We saw a", textAfter:"tree."},
+  {answer:"come", textBefore:"Please", textAfter:"here."},
+  {answer:"young", textBefore:"The", textAfter:"boy is six."},
+  {answer:"the", textBefore:"Please pass", textAfter:"salt."},
+  {answer:"into", textBefore:"Step", textAfter:"the circle."},
+  {answer:"after", textBefore:"We rest", textAfter:"lunch."},
+  {answer:"both", textBefore:"", textAfter:"teams played well."},
+  {answer:"with", textBefore:"I will go", textAfter:"my friend."},
+  {answer:"short", textBefore:"This is a", textAfter:"note."},
+  {answer:"between", textBefore:"The ball rolled", textAfter:"two boxes."},
+  {answer:"group", textBefore:"Join the", textAfter:"over there."},
+  {answer:"over", textBefore:"The kite flew", textAfter:"the trees."},
+  {answer:"children", textBefore:"The", textAfter:"are playing tag."},
+  {answer:"get", textBefore:"", textAfter:"your coat."},
+  {answer:"that", textBefore:"Do you see", textAfter:"star?"},
+  {answer:"children", textBefore:"The", textAfter:"lined up."},
+  {answer:"home", textBefore:"We are going", textAfter:"."},
+  {answer:"their", textBefore:"", textAfter:"house is on this street."},
+  {answer:"music", textBefore:"I like to dance to the", textAfter:"."},
+  {answer:"see", textBefore:"I", textAfter:"a bird."},
+  {answer:"no", textBefore:"We have", textAfter:"homework today."},
+  {answer:"fast", textBefore:"That car is", textAfter:"."},
+  {answer:"those", textBefore:"", textAfter:"shoes are mine."},
+  {answer:"though", textBefore:"We played,", textAfter:"it was cold."},
+  {answer:"play", textBefore:"We will", textAfter:"the game."},
+  {answer:"letter", textBefore:"What", textAfter:"comes next?"},
+  {answer:"horse", textBefore:"We saw a", textAfter:"at the farm."},
+  {answer:"move", textBefore:"", textAfter:"your piece forward."},
+  {answer:"earth", textBefore:"We live on the", textAfter:"."},
+  {answer:"toward", textBefore:"Run", textAfter:"the finish line."},
+  {answer:"tree", textBefore:"The", textAfter:"is tall."},
+  {answer:"wait", textBefore:"Please", textAfter:"your turn."},
+  {answer:"room", textBefore:"Clean your", textAfter:", please."},
+  {answer:"fast", textBefore:"He is a", textAfter:"runner."},
+  {answer:"color", textBefore:"What", textAfter:"is your bike?"},
+  {answer:"under", textBefore:"The cat hid", textAfter:"the bed."},
+  {answer:"though", textBefore:"I tried,", textAfter:"it was hard."},
+  {answer:"them", textBefore:"We waved to", textAfter:"."},
+  {answer:"country", textBefore:"This", textAfter:"is far away."},
+  {answer:"wait", textBefore:"", textAfter:"for the light."},
+  {answer:"by", textBefore:"I live", textAfter:"the lake."},
+  {answer:"will", textBefore:"We", textAfter:"read after lunch."},
+  {answer:"this", textBefore:"I like", textAfter:"game."},
+  {answer:"a", textBefore:"She found", textAfter:"coin on the floor."},
+  {answer:"those", textBefore:"I drew", textAfter:"pictures."},
+  {answer:"several", textBefore:"We tried", textAfter:"times."},
+  {answer:"were", textBefore:"We", textAfter:"at the park."},
+  {answer:"carry", textBefore:"", textAfter:"the box carefully."},
+  {answer:"near", textBefore:"Sit", textAfter:"your friends."},
+  {answer:"grow", textBefore:"Plants", textAfter:"in the sun."},
+  {answer:"this", textBefore:"", textAfter:"book is new."},
+  {answer:"start", textBefore:"We will", textAfter:"after lunch."},
+  {answer:"more", textBefore:"We need", textAfter:"time."},
+  {answer:"boy", textBefore:"That", textAfter:"is my friend."},
+  {answer:"many", textBefore:"", textAfter:"people helped clean."},
+  {answer:"while", textBefore:"Read quietly", textAfter:"we wait."},
+  {answer:"other", textBefore:"Try the", textAfter:"puzzle."},
+  {answer:"and", textBefore:"We read", textAfter:"we write."},
+  {answer:"night", textBefore:"Good", textAfter:", sleep well."},
+  {answer:"fish", textBefore:"The", textAfter:"swims in the pond."},
+  {answer:"many", textBefore:"We read", textAfter:"books."},
+  {answer:"her", textBefore:"", textAfter:"bike is fast."},
+  {answer:"across", textBefore:"We ran", textAfter:"the yard."},
+  {answer:"old", textBefore:"We live in an", textAfter:"house."},
+  {answer:"book", textBefore:"Pick a", textAfter:"to read."},
+  {answer:"new", textBefore:"I got a", textAfter:"backpack."},
+  {answer:"long", textBefore:"It is a", textAfter:"road."},
+  {answer:"show", textBefore:"Please", textAfter:"us the answer."},
+  {answer:"real", textBefore:"This is a", textAfter:"story."},
+  {answer:"best", textBefore:"That was the", textAfter:"part."},
+  {answer:"me", textBefore:"Give it to", textAfter:"."},
+  {answer:"her", textBefore:"Please sit with", textAfter:"."},
+  {answer:"will", textBefore:"I", textAfter:"help you."},
+  {answer:"big", textBefore:"The dog is", textAfter:"."},
+  {answer:"such", textBefore:"We had", textAfter:"a good time."},
+  {answer:"try", textBefore:"", textAfter:"again."},
+  {answer:"the", textBefore:"", textAfter:"dog ran to the gate."},
+  {answer:"day", textBefore:"We had a fun", textAfter:"."},
+  {answer:"small", textBefore:"The cat is", textAfter:"."},
+  {answer:"paper", textBefore:"Fold the", textAfter:"in half."},
+  {answer:"old", textBefore:"That is an", textAfter:"car."},
+  {answer:"look", textBefore:"", textAfter:"at the board."},
+  {answer:"early", textBefore:"We arrived", textAfter:"."},
+  {answer:"school", textBefore:"I like my", textAfter:"."},
+  {answer:"by", textBefore:"Stand", textAfter:"the window."},
+  {answer:"tell", textBefore:"Can you", textAfter:"a story?"},
+  {answer:"water", textBefore:"The", textAfter:"is cold."},
+  {answer:"happy", textBefore:"She is", textAfter:"."},
+  {answer:"into", textBefore:"Pour water", textAfter:"the cup."},
+  {answer:"because", textBefore:"I smiled", textAfter:"it was your turn."},
+  {answer:"at", textBefore:"We are", textAfter:"the door."},
+  {answer:"plant", textBefore:"The", textAfter:"needs water."},
+  {answer:"toward", textBefore:"Walk", textAfter:"the door."},
+  {answer:"follow", textBefore:"", textAfter:"the line."},
+  {answer:"that", textBefore:"", textAfter:"dog is friendly."},
+  {answer:"few", textBefore:"I have a", textAfter:"coins."},
+  {answer:"small", textBefore:"This is a", textAfter:"bug."},
+  {answer:"girl", textBefore:"That", textAfter:"is kind."},
+  {answer:"birds", textBefore:"The", textAfter:"sing in the tree."},
+  {answer:"spell", textBefore:"Can you", textAfter:"your name?"},
+  {answer:"move", textBefore:"Please", textAfter:"your chair."},
+  {answer:"could", textBefore:"She", textAfter:"finish the puzzle."},
+  {answer:"open", textBefore:"", textAfter:"your book to page two."},
+  {answer:"keep", textBefore:"", textAfter:"your hands on the rail."},
+  {answer:"its", textBefore:"The car lost", textAfter:"wheel."},
+  {answer:"happy", textBefore:"We had a", textAfter:"day."},
+  {answer:"help", textBefore:"Can you", textAfter:"your friend?"},
+  {answer:"new", textBefore:"This is a", textAfter:"book."},
+  {answer:"city", textBefore:"We live in a busy", textAfter:"."},
+  {answer:"father", textBefore:"My", textAfter:"is cooking dinner."},
+  {answer:"a", textBefore:"I saw", textAfter:"bird in the tree."},
+  {answer:"good", textBefore:"You did a", textAfter:"job."},
+  {answer:"after", textBefore:"Read a book", textAfter:"dinner."},
+  {answer:"go", textBefore:"We", textAfter:"to the library."},
+  {answer:"up", textBefore:"Look", textAfter:"at the sky."},
+  {answer:"her", textBefore:"I heard", textAfter:"sing."},
+  {answer:"young", textBefore:"They are still", textAfter:"."},
+  {answer:"with", textBefore:"Cut the paper", textAfter:"scissors."},
+  {answer:"most", textBefore:"", textAfter:"kids were ready."},
+  {answer:"and", textBefore:"I like cats", textAfter:"dogs."},
+  {answer:"same", textBefore:"We have the", textAfter:"shoes."},
+  {answer:"water", textBefore:"Drink your", textAfter:"after play."},
+  {answer:"might", textBefore:"We", textAfter:"see rain today."},
+  {answer:"because", textBefore:"We stayed inside", textAfter:"it rained."},
+  {answer:"could", textBefore:"I", textAfter:"see the moon."},
+  {answer:"black", textBefore:"He wore a", textAfter:"hat."},
+  {answer:"spell", textBefore:"Please", textAfter:"the word."},
+  {answer:"is", textBefore:"My bag", textAfter:"heavy."},
+  {answer:"can", textBefore:"We", textAfter:"share the toys."},
+  {answer:"between", textBefore:"Put the cone", textAfter:"the chairs."},
+  {answer:"earth", textBefore:"The", textAfter:"goes around the sun."},
+  {answer:"every", textBefore:"", textAfter:"seat is taken."},
+  {answer:"family", textBefore:"My", textAfter:"eats dinner together."},
+  {answer:"river", textBefore:"We crossed the", textAfter:"."},
+  {answer:"better", textBefore:"I feel", textAfter:"today."},
+  {answer:"are", textBefore:"We", textAfter:"on time."},
+  {answer:"can", textBefore:"I", textAfter:"ride my bike."},
+  {answer:"point", textBefore:"Find the high", textAfter:"on the line."},
+  {answer:"tree", textBefore:"The bird sits in the", textAfter:"."},
+  {answer:"run", textBefore:"We will", textAfter:"to the park."},
+  {answer:"close", textBefore:"", textAfter:"the door softly."},
+  {answer:"sun", textBefore:"The", textAfter:"is bright."},
+  {answer:"bring", textBefore:"Please", textAfter:"a pencil."},
+  {answer:"your", textBefore:"Wash", textAfter:"hands."},
+  {answer:"these", textBefore:"", textAfter:"blocks are heavy."},
+  {answer:"open", textBefore:"", textAfter:"the door."},
+  {answer:"group", textBefore:"Our", textAfter:"works together."},
+  {answer:"above", textBefore:"The sun is", textAfter:"the clouds."},
+  {answer:"she", textBefore:"", textAfter:"loves to draw."},
+  {answer:"day", textBefore:"It is a sunny", textAfter:"."},
+  {answer:"they", textBefore:"", textAfter:"are at the park."},
+  {answer:"might", textBefore:"He", textAfter:"come later."},
+  {answer:"dog", textBefore:"I walked the", textAfter:"."},
+  {answer:"some", textBefore:"We have", textAfter:"markers."},
+  {answer:"same", textBefore:"Read the", textAfter:"page again."},
+  {answer:"show", textBefore:"", textAfter:"me your drawing."},
+  {answer:"car", textBefore:"The", textAfter:"is red."},
+  {answer:"such", textBefore:"It was", textAfter:"a fun day."},
+  {answer:"were", textBefore:"They", textAfter:"very happy."}
 ];
 
-/* ========= Natural Language Cloze Generator (POS-aware + contexts) ========= */
-
-const CAT = {
-  ARTICLE: 'article',
-  DEMONSTRATIVE: 'demonstrative',
-  DETERMINER: 'determiner',
-  PRONOUN_SUBJ: 'pronounSubj',
-  PRONOUN_OBJ: 'pronounObj',
-  POSSESSIVE: 'possessive',
-  PREPOSITION: 'preposition',
-  BE_LINK: 'beLink',
-  DO_AUX: 'doAux',
-  MODAL: 'modal',
-  CONJ: 'conjunction',
-  WH: 'wh',
-  ADVERB: 'adverb',
-  NEGATION: 'negation',
-  NUMBER: 'number',
-  NOUN: 'noun',
-  VERB: 'verb',
-  ADJ: 'adjective',
-  META: 'meta'
+/* Auto-generate 200+ cloze sentences tailored by rough part-of-speech buckets.
+   We cover function words with specific patterns; the rest use safe neutral templates. */
+const POS_BUCKETS = {
+  articles: new Set(["the","a","an"]),
+  preps: new Set(["to","in","on","at","by","with","from","into","over","under","between","through","after","before","around","above","below","near","off","up","out","across","during"]),
+  pronouns: new Set(["I","you","he","she","it","we","they","me","him","her","us","them","my","your","his","her","its","our","their"]),
+  beAux: new Set(["am","is","are","was","were"]),
+  modals: new Set(["can","will","would","could","should","may","might","must","shall"]),
+  conj: new Set(["and","but","or","so","because","if","when","while","though","after","before","until"]),
+  det: new Set(["this","that","these","those","some","any","each","every","no"]),
 };
 
-const SETS = {
-  article: new Set(['the','a','an']),
-  demonstrative: new Set(['this','that','these','those']),
-  determiner: new Set(['some','any','each','every','no','both','another','other','many','few','several','more','most','such','own','same','another']),
-  pronounSubj: new Set(['i','you','he','she','it','we','they']),
-  pronounObj: new Set(['me','him','her','us','them']),
-  possessive: new Set(['my','your','his','her','its','our','their']),
-  preposition: new Set(['in','on','at','by','with','from','into','over','under','between','through','after','before','around','above','below','near','off','up','out','across','during','toward','to']),
-  beLink: new Set(['am','is','are','was','were']),
-  doAux: new Set(['do','does','did']),
-  modal: new Set(['can','will','would','could','should','may','might','must','shall']),
-  conjunction: new Set(['and','but','or','so','because','if','when','while','though','until','after','before']),
-  wh: new Set(['what','when','where','why','how','which','who','whom','whose']),
-  adverb: new Set(['very','too','also','just','now','then','so','not','only','even','still','again','always','often','never']),
-  negation: new Set(['no',"don't","didn’t","didn't","can’t","cant","cannot","won’t","wouldn’t","shouldn’t"]),
-  number: new Set(['one','two','three','four','five','six','seven','eight','nine','ten','hundred','thousand'])
-};
+;
+  }
+  // PREPOSITIONS
+  if (POS_BUCKETS.preps.has(wl)){
+    const map = {
+      "to": {b:"We walked ___ the park",a:"."},
+      "in": {b:"Put the crayons ___ the box",a:"."},
+      "on": {b:"Keep your hands ___ the rail",a:"."},
+      "at": {b:"Meet me ___ the library",a:"."},
+      "by": {b:"Stand ___ the door",a:"."},
+      "with": {b:"I like pancakes ___ syrup",a:"."},
+      "from": {b:"This note is ___ Mom",a:"."},
+      "into": {b:"Step ___ the circle",a:"."},
+      "over": {b:"Jump ___ the puddle",a:"!"},
+      "under": {b:"The cat hides ___ the table",a:"."},
+      "between": {b:"The ball rolled ___ the chairs",a:"."},
+      "through": {b:"Walk ___ the tunnel",a:"."},
+      "after": {b:"We will play ___ lunch",a:"."},
+      "before": {b:"Wash hands ___ dinner",a:"."},
+      "around": {b:"Run ___ the cones",a:"."},
+      "above": {b:"The kite flew ___ the trees",a:"."},
+      "below": {b:"The fish swim ___ the dock",a:"."},
+      "near": {b:"Sit ___ your friends",a:"."},
+      "off": {b:"Please turn ___ the light",a:"."},
+      "up": {b:"Climb ___ the ladder",a:"."},
+      "out": {b:"Take the trash ___",a:"."},
+      "across": {b:"Look both ways ___ the street",a:"."},
+      "during": {b:"Stay quiet ___ the show",a:"."}
+    };
+    const t = map[wl] || {b:"We go ___ the park",a:"."};
+    return {answer: wl, textBefore:t.b.replace("___", "___"), textAfter:t.a};
+  }
+  // PRONOUNS / DETERMINERS
+  if (POS_BUCKETS.pronouns.has(w)) return {answer: wl, textBefore:"___ will share the blocks", textAfter:"."};
+  if (POS_BUCKETS.det.has(wl)) return {answer: wl, textBefore:"___ cookie fell on the plate", textAfter:"."};
 
-/* Kid-friendly templates by category */
-const TEMPLATES = {
-  [CAT.ARTICLE]: [
-    "___ dog ran fast.",
-    "I saw ___ bird in the tree.",
-    "Please hand me ___ book."
-  ],
-  [CAT.DEMONSTRATIVE]: [
-    "___ cookie is for you.",
-    "Put ___ toys in the bin.",
-    "I like ___ game a lot."
-  ],
-  [CAT.DETERMINER]: [
-    "I have ___ stickers to share.",
-    "Are there ___ crayons left?",
-    "We need ___ help today."
-  ],
-  [CAT.PRONOUN_SUBJ]: [
-    "___ like to play outside.",
-    "___ is my best friend.",
-    "Can ___ come with us?"
-  ],
-  [CAT.PRONOUN_OBJ]: [
-    "Mom helped ___ tie my shoes.",
-    "I saw ___ at the park.",
-    "Please give the ball to ___."
-  ],
-  [CAT.POSSESSIVE]: [
-    "That is ___ backpack.",
-    "___ teacher is very kind.",
-    "I forgot ___ homework."
-  ],
-  [CAT.PREPOSITION]: [
-    "The ball is ___ the box.",
-    "We hide ___ the table.",
-    "The cat sleeps ___ my bed."
-  ],
-  [CAT.BE_LINK]: [
-    "The soup ___ hot.",
-    "We ___ ready to go.",
-    "My name ___ Sam."
-  ],
-  [CAT.DO_AUX]: [
-    "___ you want to read?",
-    "___ he like apples?",
-    "We ___ our chores."
-  ],
-  [CAT.MODAL]: [
-    "I ___ ride my bike.",
-    "She ___ help you.",
-    "We ___ play after lunch."
-  ],
-  [CAT.CONJ]: [
-    "I like cats ___ dogs.",
-    "It is sunny ___ warm.",
-    "We stayed inside ___ it rained."
-  ],
-  [CAT.WH]: [
-    "___ is your favorite book?",
-    "___ do we go to class?",
-    "___ should we try next?"
-  ],
-  [CAT.ADVERB]: [
-    "You read ___ well.",
-    "He ran ___ fast.",
-    "She is ___ happy today."
-  ],
-  [CAT.NEGATION]: [
-    "___ running in the hall!",
-    "I ___ know the answer.",
-    "We ___ have time."
-  ],
-  [CAT.NUMBER]: [
-    "We have ___ apples.",
-    "Write the number ___.",
-    "Count to ___ together."
-  ],
-  [CAT.META]: [
-    "Can you read ___ out loud?",
-    "Please write the word ___.",
-    "Point to ___ in your book.",
-    "Use ___ in a sentence.",
-    "Spell ___ with letter tiles."
-  ],
-  [CAT.NOUN]: [
-    "The ___ is big.",
-    "I saw the ___ today.",
-    "Please draw the ___."
-  ],
-  [CAT.VERB]: [
-    "I like to ___ fast.",
-    "We will ___ to the park.",
-    "Can you ___ with me?"
-  ],
-  [CAT.ADJ]: [
-    "The house is ___.",
-    "This is a ___ book.",
-    "We had a ___ day."
-  ]
-};
+  // BE verbs
+  if (POS_BUCKETS.beAux.has(wl)){
+    const map = {
+      "am": {b:"I ___ ready to read",a:"!"},
+      "is": {b:"The soup ___ hot",a:"."},
+      "are": {b:"We ___ on time",a:"."},
+      "was": {b:"It ___ raining yesterday",a:"."},
+      "were": {b:"We ___ at the park",a:"."}
+    };
+    const t = map[wl];
+    if (t) return {answer: wl, textBefore:t.b, textAfter:t.a};
+  }
 
-/* Word-Specific Context Templates (collocations) */
-const NOUN_CONTEXTS = {
-  river: ["The ___ is wide.", "We crossed the ___.", "The ___ flows past the town."],
-  water: ["Drink your ___ after play.", "The ___ is cold.", "Please pour the ___ carefully."],
-  school: ["We walked to ___ today.", "I like my ___.", "Our ___ is near the park."],
-  father: ["My ___ is cooking dinner.", "I went with my ___ to the store."],
-  mother: ["My ___ reads to me.", "I hugged my ___."],
-  city: ["The ___ is very big.", "We live in a busy ___."],
-  earth: ["The ___ goes around the sun.", "We live on the ___."],
-  tree: ["The ___ is tall.", "A bird sits in the ___."],
-  story: ["Read the ___ out loud.", "That ___ is funny."],
-  paper: ["Write your name on the ___.", "Fold the ___ in half."],
-  car: ["Get in the ___.", "The ___ is red."],
-  night: ["Good ___, sleep well.", "At ___ the stars come out."],
-  day: ["It is a sunny ___.", "We had a fun ___."],
-  hand: ["Raise your ___.", "Wash your ___ before lunch."],
-  home: ["We are going ___.", "I like to be at ___."],
-  boy: ["The ___ kicks the ball.", "That ___ is my friend."],
-  girl: ["The ___ is reading.", "That ___ is kind."],
-  door: ["Please open the ___.", "Close the ___ softly."],
-  table: ["Put the crayons on the ___.", "We eat at the ___."],
-  room: ["Clean your ___, please.", "The ___ is quiet."],
-  book: ["Pick a ___ to read.", "This ___ is new."],
-  dog: ["The ___ barked loudly.", "I walked the ___."],
-  horse: ["The ___ runs fast.", "We saw a ___ at the farm."],
-  birds: ["The ___ sing in the tree.", "I see two ___ in the sky."],
-  music: ["The ___ is very soft.", "I like to dance to the ___."],
-  color: ["Blue is my favorite ___.", "What ___ is your bike?"],
-  sun: ["The ___ is bright.", "Do not look at the ___."],
-  fish: ["The ___ swims in the pond.", "We fed the ___."],
-  family: ["My ___ eats dinner together.", "I love my ___."],
-  body: ["Your ___ needs rest.", "Move your ___ to the music."],
-  friend: ["My ___ is kind.", "I will help my ___."],
-  children: ["The ___ lined up.", "The ___ are playing tag."],
-  group: ["Our ___ works together.", "Join the ___ over there."],
-  world: ["The ___ is big.", "We learn about the ___."],
-  country: ["Our ___ has many cities.", "This ___ is far away."],
-  plant: ["The ___ needs water.", "A new ___ is growing."],
-  page: ["Turn the ___.", "Find the ___ with the picture."],
-  letter: ["Write one ___ here.", "What ___ comes next?"],
-  point: ["Please ___ to the map.", "Find the high ___ on the line."]
-};
+  // MODALS
+  if (POS_BUCKETS.modals.has(wl)){
+    return {answer: wl, textBefore:`I ___ try again`, textAfter:"."};
+  }
 
-const VERB_CONTEXTS = {
-  run: ["I like to ___ fast.", "We will ___ to the park."],
-  walk: ["Let’s ___ to class.", "We ___ across the field."],
-  play: ["We will ___ the game.", "Can you ___ with me?"],
-  read: ["Please ___ the book.", "We ___ together every night."],
-  write: ["___ your name.", "Can you ___ a sentence?"],
-  make: ["Let’s ___ a card for Grandma.", "We ___ a big tower."],
-  see: ["Can you ___ the rainbow?", "I ___ a bird."],
-  look: ["___ both ways before crossing.", "___ at the board."],
-  come: ["Please ___ here.", "Can you ___ to my desk?"],
-  go: ["Ready, set, ___!", "We ___ to the library."],
-  get: ["___ your coat.", "I will ___ my pencil."],
-  find: ["Can you ___ the page?", "Let’s ___ your shoes."],
-  start: ["___ the game.", "We will ___ after lunch."],
-  keep: ["___ your hands on the rail.", "Please ___ trying."],
-  learn: ["___ to spell this word.", "We will ___ new things."],
-  spell: ["Please ___ the word.", "Can you ___ your name?"],
-  help: ["Please ___ me zip this.", "Can you ___ your friend?"],
-  show: ["___ me your drawing.", "Please ___ us the answer."],
-  tell: ["___ me your idea.", "Can you ___ a story?"],
-  try: ["___ again.", "Let’s ___ this one."],
-  move: ["___ your piece forward.", "Please ___ your chair."],
-  ask: ["___ a question.", "You can ___ for help."],
-  follow: ["___ the line.", "Please ___ the rules."],
-  carry: ["___ the box carefully.", "Can you ___ this bag?"],
-  grow: ["Plants ___ in the sun.", "Children ___ each year."],
-  bring: ["___ your book to class.", "Please ___ a pencil."],
-  give: ["___ me five!", "Please ___ the note to Mom."],
-  wait: ["___ for the light.", "Please ___ your turn."],
-  open: ["___ the door.", "___ your book to page two."],
-  close: ["___ the door softly.", "Please ___ your eyes."],
-  change: ["___ your seat.", "The leaves ___ color."]
-};
+  // CONJUNCTIONS
+  if (POS_BUCKETS.conj.has(wl)){
+    const map = {
+      "and": {b:"I like apples ___ bananas",a:"."},
+      "but": {b:"I want to play ___ it’s late",a:"."},
+      "or": {b:"Do you want milk ___ water",a:"?"},
+      "so": {b:"It’s raining, ___ we’ll stay inside",a:"."},
+      "because": {b:"I smiled ___ it’s your birthday",a:"."},
+      "if": {b:"___ you’re ready, we can go",a:"."},
+      "when": {b:"I clap ___ the song ends",a:"."},
+      "while": {b:"Read quietly ___ we wait",a:"."},
+      "though": {b:"I tried, ___ it was hard",a:"."},
+      "after": {b:"Brush teeth ___ dinner",a:"."},
+      "before": {b:"Pack your bag ___ school",a:"."},
+      "until": {b:"Wait here ___ the light turns green",a:"."}
+    };
+    const t = map[wl] || {b:"I read ___ I rest",a:"."};
+    return {answer: wl, textBefore:t.b, textAfter:t.a};
+  }
 
-const ADJECTIVE_CONTEXTS = {
-  big: ["The dog is ___.", "We saw a ___ tree."],
-  small: ["The cat is ___.", "This is a ___ bug."],
-  little: ["The ___ bird can fly.", "He has a ___ car."],
-  new: ["This is a ___ book.", "I got a ___ backpack."],
-  old: ["That is an ___ car.", "We live in an ___ house."],
-  good: ["You did a ___ job.", "That is a ___ idea."],
-  great: ["You made a ___ choice.", "It was a ___ game."],
-  high: ["The kite is ___.", "We climbed the ___ hill."],
-  long: ["It is a ___ road.", "Read the ___ story."],
-  short: ["It is a ___ line.", "This is a ___ note."],
-  white: ["The snow is ___.", "I saw a ___ bird."],
-  black: ["The cat is ___.", "He wore a ___ hat."],
-  red: ["The door is ___.", "She has a ___ ball."],
-  best: ["You are my ___ friend.", "That was the ___ part."],
-  better: ["This plan is ___.", "I feel ___ today."],
-  early: ["It is ___ in the morning.", "We arrived ___. "],
-  fast: ["He is a ___ runner.", "That car is ___."],
-  low: ["The cloud is ___.", "Keep the sound ___."],
-  real: ["This is a ___ story.", "Is the coin ___?"],
-  young: ["The ___ boy is six.", "They are still ___."],
-  happy: ["She is ___.", "We had a ___ day."]
-};
-
-const PREPOSITION_OBJECTS = {
-  in: ["the box","the room","the backpack"],
-  on: ["the table","the page","the line"],
-  at: ["the park","the door","the desk"],
-  by: ["the door","the window","the gate"],
-  with: ["a friend","your sister","your class"],
-  from: ["home","the store","Grandma"],
-  into: ["the circle","the pool","the house"],
-  over: ["the puddle","the hill","the fence"],
-  under: ["the table","the bed","the tree"],
-  between: ["two chairs","the cones","the lines"],
-  through: ["the tunnel","the gate","the crowd"],
-  after: ["lunch","the game","the movie"],
-  before: ["school","bedtime","dinner"],
-  around: ["the cones","the block","the park"],
-  above: ["the trees","the clouds","the roof"],
-  below: ["the dock","the hill","the bridge"],
-  near: ["your friends","the bench","the sign"],
-  off: ["the light","the heater","the fan"],
-  up: ["the ladder","the steps","the hill"],
-  out: ["the door","the box","the bag"],
-  across: ["the street","the yard","the bridge"],
-  during: ["the show","the test","the movie"],
-  toward: ["the goal","the stage","the finish line"],
-  to: ["the library","class","the park"]
-};
-
-/* Categorizer */
-function categorizeWord(raw) {
-  const w = raw.toLowerCase();
-  if (NOUN_CONTEXTS[w]) return CAT.NOUN;
-  if (VERB_CONTEXTS[w]) return CAT.VERB;
-  if (ADJECTIVE_CONTEXTS[w]) return CAT.ADJ;
-
-  if (SETS.article.has(w)) return CAT.ARTICLE;
-  if (SETS.demonstrative.has(w)) return CAT.DEMONSTRATIVE;
-  if (SETS.determiner.has(w)) return CAT.DETERMINER;
-  if (SETS.pronounSubj.has(w)) return CAT.PRONOUN_SUBJ;
-  if (SETS.pronounObj.has(w)) return CAT.PRONOUN_OBJ;
-  if (SETS.possessive.has(w)) return CAT.POSSESSIVE;
-  if (SETS.preposition.has(w)) return CAT.PREPOSITION;
-  if (SETS.beLink.has(w)) return CAT.BE_LINK;
-  if (SETS.doAux.has(w)) return CAT.DO_AUX;
-  if (SETS.modal.has(w)) return CAT.MODAL;
-  if (SETS.conjunction.has(w)) return CAT.CONJ;
-  if (SETS.wh.has(w)) return CAT.WH;
-  if (SETS.adverb.has(w)) return CAT.ADVERB;
-  if (SETS.negation.has(w)) return CAT.NEGATION;
-  if (SETS.number.has(w)) return CAT.NUMBER;
-  return CAT.META;
+  // Common verbs/nouns/adjectives fallback (safe & natural)
+  // We keep it simple and age-appropriate:
+  const genericPatterns = [
+    {b:"I saw ___ on the page", a:"."},
+    {b:"We say ___ together", a:"."},
+    {b:"Write the word ___", a:"."},
+    {b:"Can you read ___ out loud", a:"?"},
+    {b:"Point to ___ in your book", a:"."},
+    {b:"Spell ___ using the letter tiles", a:"."},
+    {b:"Use ___ in a sentence", a:"."}
+  ];
+  const pick = genericPatterns[Math.floor(Math.random()*genericPatterns.length)];
+  return {answer: wl, textBefore: pick.b, textAfter: pick.a};
 }
 
-/* Build sentence */
-function buildSentenceFor(word) {
-  const w = word.toLowerCase();
-
-  // 1) Word-specific contexts
-  if (NOUN_CONTEXTS[w]) {
-    const s = NOUN_CONTEXTS[w][Math.floor(Math.random()*NOUN_CONTEXTS[w].length)];
-    const [b,a=''] = s.split('___');
-    return { answer:w, textBefore:b.trim(), textAfter:a.trim() };
-  }
-  if (VERB_CONTEXTS[w]) {
-    const s = VERB_CONTEXTS[w][Math.floor(Math.random()*VERB_CONTEXTS[w].length)];
-    const [b,a=''] = s.split('___');
-    return { answer:w, textBefore:b.trim(), textAfter:a.trim() };
-  }
-  if (ADJECTIVE_CONTEXTS[w]) {
-    const s = ADJECTIVE_CONTEXTS[w][Math.floor(Math.random()*ADJECTIVE_CONTEXTS[w].length)];
-    const [b,a=''] = s.split('___');
-    return { answer:w, textBefore:b.trim(), textAfter:a.trim() };
-  }
-
-  // 2) Prepositions with object bank
-  if (SETS.preposition.has(w)) {
-    const objs = PREPOSITION_OBJECTS[w] || ["the box"];
-    const obj = objs[Math.floor(Math.random()*objs.length)];
-    const template = "The ball is ___ " + obj + ".";
-    const [b,a=''] = template.split('___');
-    return { answer:w, textBefore:b.trim(), textAfter:a.trim() };
-  }
-
-  // 3) Category-based template fallback
-  const cat = categorizeWord(w);
-  const list = TEMPLATES[cat] || TEMPLATES[CAT.META];
-  const template = list[Math.floor(Math.random() * list.length)];
-  const [before, after=''] = template.split('___');
-  return { answer: w, textBefore: before.trim(), textAfter: after.trim() };
+/* Build a large deck: curated + 220 auto-generated unique words */
 }
-
-/* Build a large deck */
-function buildAutoDeck(n = 300) {
-  const used = new Set(CURATED.map(s => s.answer.toLowerCase()));
-  const autos = [];
-  const pool = [...FRY_WORDS].sort(() => Math.random() - 0.5);
-  for (const w of pool) {
-    const wl = w.toLowerCase();
-    if (used.has(wl)) continue;
-    const s = buildSentenceFor(wl);
-    if (s && s.textBefore && (s.textBefore.length + (s.textAfter||'').length) >= 8) {
-      autos.push(s);
-      used.add(wl);
-    }
-    if (autos.length >= n) break;
-  }
   return autos;
 }
-
-/* Rebuild the deck */
-const SENTENCES = [...CURATED, ...buildAutoDeck(300)];
 
 
 
