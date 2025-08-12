@@ -1,1 +1,497 @@
-1
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Learn2Read – Fry Words Game</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#6C63FF">
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --primary:#6C63FF;
+      --primary-2:#9b95ff;
+      --accent:#FFB703;
+      --good:#06a77d;
+      --bad:#e63946;
+      --text:#222;
+      --muted:#6b7280;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      background:
+        radial-gradient(70% 50% at 10% 0%, #efeaff 0%, transparent 70%),
+        radial-gradient(60% 40% at 90% 10%, #ffe9c7 0%, transparent 60%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;flex-direction:column;
+    }
+    header{
+      background:linear-gradient(90deg,var(--primary),#7a74ff);
+      color:#fff;
+      padding:10px 16px;
+      display:flex;align-items:center;gap:12px;justify-content:space-between;
+      position:sticky;top:0;z-index:10;
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.3px}
+    .nav{display:flex;gap:10px;align-items:center;color:#fff}
+    .pill{
+      background:rgba(255,255,255,.18);
+      padding:6px 10px;border-radius:999px;font-size:13px
+    }
+    .btn{
+      border:0;border-radius:12px;padding:10px 16px;font-weight:700;
+      background:#fff;color:var(--primary);cursor:pointer;
+      box-shadow:0 8px 16px rgba(0,0,0,.08);
+      transition:transform .06s ease, box-shadow .2s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.secondary{background:transparent;color:#fff;border:2px solid #fff}
+    main{flex:1;display:grid;place-items:center;padding:24px}
+    .card{
+      width:min(900px,95vw); background:var(--card); border-radius:24px; padding:24px;
+      box-shadow:0 20px 60px rgba(0,0,0,.12);
+      position:relative; overflow:hidden;
+    }
+    .subtitle{color:var(--muted);margin:4px 0 16px;font-size:14px}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .sentence{
+      font-size:26px;line-height:1.4;margin:14px 0 6px;
+    }
+    .blank{
+      display:inline-flex;gap:6px;vertical-align:middle;margin:0 6px;
+    }
+    .tile{
+      width:46px;height:58px;border-radius:14px;border:2px solid #e5e7eb;background:#f9fafb;
+      font-size:28px;text-transform:lowercase;text-align:center;font-weight:800;color:#111;
+      caret-color:transparent;outline:none;
+      box-shadow:inset 0 -4px 0 #e5e7eb;
+    }
+    .tile:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,99,255,.25), inset 0 -4px 0 #e5e7eb}
+    .actions{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap}
+    .msg{margin-top:12px;font-weight:700}
+    .msg.good{color:var(--good)}
+    .msg.bad{color:var(--bad)}
+    .progress{margin-top:10px;color:var(--muted);font-size:14px}
+    .chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .chip{
+      font-size:12px;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3
+    }
+    footer{padding:18px;text-align:center;color:var(--muted);font-size:12px}
+    .confetti{position:absolute;inset:0;pointer-events:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="icons/icon-192.png" alt="" width="32" height="32" style="border-radius:8px;box-shadow:0 3px 8px rgba(0,0,0,.25)">
+      <h1>Learn2Read</h1>
+      <span class="pill">Fry Instant Words</span>
+    </div>
+    <div class="nav">
+      <button id="newGameBtn" class="btn secondary">New Game</button>
+      <button id="resetBtn" class="btn secondary" title="Clears progress & score">Reset Game</button>
+      <span class="pill">✅ Correct: <b id="scoreCorrect">0</b></span>
+      <span class="pill">❌ Incorrect: <b id="scoreIncorrect">0</b></span>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <canvas class="confetti" id="confetti"></canvas>
+
+      <div class="subtitle">Fill in the missing word using letter boxes, then tap <b>Grade</b>.</div>
+      <div id="sentence" class="sentence">Press <b>New Game</b> to start.</div>
+      <div class="actions">
+        <button id="gradeBtn" class="btn">Grade</button>
+        <button id="nextBtn" class="btn" style="display:none">Next Sentence</button>
+        <button id="revealBtn" class="btn" style="display:none">Show Hint</button>
+      </div>
+      <div id="message" class="msg"></div>
+      <div class="progress" id="progress"></div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </main>
+
+  <footer>Words: Fry Instant Words (600). Source: UEN & Dr. Edward Fry resources.</footer>
+
+<script>
+/* --- PWA bootstrap --- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(console.error);
+  });
+}
+
+/* --- Data: Fry Instant Words -------------------------------------------------
+   Sources (for your reference):
+   - UEN Fry Instant Words (ranked 1–600) – https://www.uen.org/k-2educator/word_lists.shtml
+   - Dr. Edward Fry Instant Word List PDF (1–600) – by Tim Rasinski
+----------------------------------------------------------------------------- */
+const FRY_WORDS = [
+  // First 100
+  "the","of","and","a","to","in","is","you","that","it","he","was","for","on","are","as","with","his","they","I",
+  "at","be","this","have","from","or","one","had","by","word","but","not","what","all","were","we","when","your","can","said",
+  "there","use","an","each","which","she","do","how","their","if","will","up","other","about","out","many","then","them","these","so",
+  "some","her","would","make","like","him","into","time","has","look","two","more","write","go","see","number","no","way","could","people",
+  "my","than","first","water","been","call","who","oil","its","now","find","long","down","day","did","get","come","made","may","part",
+  // Second 100
+  "over","new","sound","take","only","little","work","know","place","year","live","me","back","give","most","very","after","thing","our","just",
+  "name","good","sentence","man","think","say","great","where","help","through","much","before","line","right","too","means","old","any","same","tell",
+  "boy","follow","came","want","show","also","around","form","three","small","set","put","end","does","another","well","large","must","big","even",
+  "such","because","turn","here","why","ask","went","men","read","need","land","different","home","us","move","try","kind","hand","picture","again",
+  // Third 100
+  "change","off","play","spell","air","away","animal","house","point","page","letter","mother","answer","found","study","still","learn","should","America","world",
+  "high","every","near","add","food","between","own","below","country","plant","last","school","father","keep","tree","never","start","city","earth","eye",
+  "light","thought","head","under","story","saw","left","don’t","few","while","along","might","close","something","seem","next","hard","open","example","begin",
+  "life","always","those","both","paper","together","got","group","often","run","important","until","children","side","feet","car","mile","night","walk","white",
+  // Fourth 100
+  "sea","began","grow","took","river","four","carry","state","once","book","hear","stop","without","second","late","miss","idea","enough","eat","face",
+  "watch","far","Indian","real","almost","let","above","girl","sometimes","mountains","cut","young","talk","soon","list","song","being","leave","family","body",
+  "music","color","stand","sun","questions","fish","area","mark","dog","horse","birds","problem","complete","room","knew","since","ever","piece","told","usually",
+  "didn’t","friends","easy","heard","order","red","door","sure","become","top","ship","across","today","during","short","better","best","however","low",
+  // Fifth 100
+  "hours","black","products","happened","whole","measure","remember","early","waves","reached","listen","wind","rock","space","covered","fast","several","hold","himself","toward",
+  "five","step","morning","passed","vowel","true","hundred","against","pattern","numeral","table","north","slowly","money","map","farm","pulled","draw","voice","seen",
+  "cold","cried","plan","notice","south","sing","war","ground","fall","king","town","I’ll","unit","figure","certain","field","travel","wood","fire","upon",
+  "done","English","road","half","ten","fly","gave","box","finally","wait","correct","oh","quickly","person","became","shown","minutes","strong","verb","stars",
+  // Sixth 100
+  "front","feel","fact","inches","street","decided","contain","course","surface","produce","building","ocean","class","note","nothing","rest","carefully","scientists","inside","wheels",
+  "stay","green","known","island","week","less","machine","base","ago","stood","plane","system","behind","ran","round","boat","game","force","brought","understand",
+  "warm","common","bring","explain","dry","though","language","shape","deep","thousands","yes","clear","equation","yet","government","filled","heat","full","hot","check",
+  "object","am","rule","among","noun","power","cannot","able","six","size","dark","ball","material","special","heavy","fine","pair","circle","include","built",
+  "can’t","matter","square","syllables","perhaps","bill","felt","suddenly","test","direction","center","farmers","ready","anything","divided","general","energy","subject","Europe","moon",
+  "region","return","believe","dance","members","picked","simple","cells","paint","mind","love","cause","rain","exercise","eggs","train","blue","wish","drop","developed",
+  "window","difference","distance","heart","site","sum","summer","wall","forest","probably","legs","sat","main","winter","wide","written","length","reason","kept","interest",
+  "arms","brother","race","present","beautiful","store","job","edge","past","sign","record","finished","discovered","wild","happy","beside","gone","sky","million","west",
+  "lay","weather","root","instruments","meet","third","months","paragraph","raised","represent"
+];
+
+// Curated sentence bank (kid-friendly). Each has exactly one missing word from FRY_WORDS.
+// You can easily add more! Format: { textBefore, answer, textAfter }
+const SENTENCES = [
+  {answer:"the", textBefore:"___ cat is sleeping on the mat", textAfter:"."},
+  {answer:"and", textBefore:"Cookies ___ milk are on the table", textAfter:"."},
+  {answer:"to", textBefore:"We walk ___ school each day", textAfter:"."},
+  {answer:"in", textBefore:"Put the toy ___ the box", textAfter:"."},
+  {answer:"is", textBefore:"The soup ___ hot", textAfter:"."},
+  {answer:"you", textBefore:"___ are my friend", textAfter:"!"},
+  {answer:"it", textBefore:"Zip up your jacket so ___ stays warm", textAfter:"."},
+  {answer:"was", textBefore:"Yesterday it ___ raining", textAfter:"."},
+  {answer:"on", textBefore:"Please keep both hands ___ the handlebars", textAfter:"."},
+  {answer:"are", textBefore:"We ___ ready to go", textAfter:"!"},
+  {answer:"with", textBefore:"I like pancakes ___ syrup", textAfter:"."},
+  {answer:"they", textBefore:"___ will come to the park", textAfter:"."},
+  {answer:"at", textBefore:"Meet me ___ the swings", textAfter:"."},
+  {answer:"this", textBefore:"___ puzzle is tricky", textAfter:"."},
+  {answer:"have", textBefore:"Do you ___ a pencil", textAfter:"?"},
+  {answer:"from", textBefore:"This letter is ___ Grandma", textAfter:"."},
+  {answer:"one", textBefore:"I saw ___ bright star", textAfter:"."},
+  {answer:"by", textBefore:"Stand ___ the door and wave", textAfter:"."},
+  {answer:"but", textBefore:"I want to play ___ it’s bedtime", textAfter:"."},
+  {answer:"what", textBefore:"___ is your favorite game", textAfter:"?"},
+  {answer:"all", textBefore:"We cleaned up ___ the blocks", textAfter:"."},
+  {answer:"we", textBefore:"___ built a tall tower", textAfter:"!"},
+  {answer:"when", textBefore:"I smile ___ I see you", textAfter:"."},
+  {answer:"can", textBefore:"I ___ tie my shoes", textAfter:"."},
+  {answer:"said", textBefore:"Mom ___ it’s story time", textAfter:"."},
+  {answer:"there", textBefore:"Look over ___ for our seats", textAfter:"."},
+  {answer:"use", textBefore:"Please ___ gentle hands", textAfter:"."},
+  {answer:"which", textBefore:"___ book should we read", textAfter:"?"},
+  {answer:"do", textBefore:"___ your best", textAfter:"!"},
+  {answer:"how", textBefore:"___ many jumps can you do", textAfter:"?"},
+  {answer:"their", textBefore:"The twins lost ___ hats", textAfter:"."},
+  {answer:"if", textBefore:"___ it rains, we’ll play inside", textAfter:"."},
+  {answer:"up", textBefore:"Climb ___ the ladder carefully", textAfter:"."},
+  {answer:"out", textBefore:"Take the trash ___", textAfter:"."},
+  {answer:"then", textBefore:"First brush, ___ rinse", textAfter:"."},
+  {answer:"so", textBefore:"It’s late, ___ let’s head home", textAfter:"."},
+  {answer:"her", textBefore:"She loves ___ pink backpack", textAfter:"."},
+  {answer:"make", textBefore:"Let’s ___ a card for Grandpa", textAfter:"."},
+  {answer:"like", textBefore:"I ___ to read before bed", textAfter:"."},
+  {answer:"into", textBefore:"Step ___ the circle", textAfter:"."},
+  {answer:"time", textBefore:"It’s ___ to get ready", textAfter:"."},
+  {answer:"has", textBefore:"Our dog ___ a waggy tail", textAfter:"."},
+  {answer:"look", textBefore:"___ both ways before crossing", textAfter:"."},
+  {answer:"more", textBefore:"May I have ___ water", textAfter:"?"},
+  {answer:"go", textBefore:"Ready, set, ___!", textAfter:""},
+  {answer:"see", textBefore:"Can you ___ the rainbow", textAfter:"?"},
+  {answer:"no", textBefore:"___ running in the hallway", textAfter:"!"},
+  {answer:"way", textBefore:"This is the ___ to the library", textAfter:"."},
+  {answer:"people", textBefore:"Many ___ helped clean the park", textAfter:"."},
+  {answer:"my", textBefore:"___ shoes light up", textAfter:"!"},
+  {answer:"first", textBefore:"Put your name ___", textAfter:"."},
+  {answer:"water", textBefore:"Drink your ___ after play", textAfter:"."},
+  {answer:"new", textBefore:"I got a ___ book today", textAfter:"."},
+  {answer:"little", textBefore:"The ___ frog can jump high", textAfter:"."},
+  {answer:"know", textBefore:"I ___ the answer", textAfter:"!"},
+  {answer:"place", textBefore:"This is our favorite ___", textAfter:"."},
+  {answer:"year", textBefore:"Happy New ___", textAfter:"!"},
+  {answer:"very", textBefore:"You did ___ well", textAfter:"!"},
+  {answer:"after", textBefore:"We’ll play ___ lunch", textAfter:"."},
+  {answer:"help", textBefore:"Please ___ me zip this", textAfter:"."},
+  {answer:"too", textBefore:"I want to play ___", textAfter:"!"},
+  {answer:"old", textBefore:"My bike is not that ___", textAfter:"."},
+  {answer:"any", textBefore:"Do you have ___ tape", textAfter:"?"},
+  {answer:"tell", textBefore:"___ me your idea", textAfter:"."},
+  {answer:"boy", textBefore:"The ___ kicks the ball", textAfter:"."},
+  {answer:"came", textBefore:"Grandpa ___ to visit", textAfter:"."},
+  {answer:"want", textBefore:"I ___ to try again", textAfter:"."},
+  {answer:"also", textBefore:"I like apples and bananas ___", textAfter:"."},
+  {answer:"three", textBefore:"We have ___ cookies", textAfter:"."},
+  {answer:"does", textBefore:"What ___ the sign say", textAfter:"?"},
+  {answer:"well", textBefore:"You read that very ___", textAfter:"!"},
+  {answer:"here", textBefore:"Come sit right ___", textAfter:"."},
+  {answer:"why", textBefore:"___ is the sky blue", textAfter:"?"},
+  {answer:"ask", textBefore:"___ a question kindly", textAfter:"."},
+  {answer:"read", textBefore:"Let’s ___ one more page", textAfter:"."},
+  {answer:"need", textBefore:"Do you ___ a snack", textAfter:"?"},
+  {answer:"home", textBefore:"We are going ___ now", textAfter:"."},
+  {answer:"try", textBefore:"It’s okay—just ___ again", textAfter:"."},
+  {answer:"again", textBefore:"Wow! Do that trick ___", textAfter:"!"},
+  {answer:"run", textBefore:"Don’t ___ by the pool", textAfter:"."},
+  {answer:"children", textBefore:"All the ___ lined up", textAfter:"."},
+  {answer:"car", textBefore:"Buckle your seat in the ___", textAfter:"."},
+  {answer:"night", textBefore:"Good ___, sleep tight", textAfter:"."},
+  {answer:"walk", textBefore:"Let’s ___ the dog", textAfter:"."},
+  {answer:"white", textBefore:"Snow looks so ___", textAfter:"."}
+];
+// If you want *more* coverage, add more items above. The game will auto-shuffle them.
+
+/* --- Local storage keys --- */
+const LS_KEY = 'l2r_state_v1';
+
+/* --- State --- */
+let order = [];           // shuffled indexes for SENTENCES
+let idx = 0;              // current position in order
+let scoreCorrect = 0;
+let scoreIncorrect = 0;
+let countedThisCard = false; // whether we've already counted an incorrect for the current card
+
+/* --- Elements --- */
+const $sentence = document.getElementById('sentence');
+const $message  = document.getElementById('message');
+const $progress = document.getElementById('progress');
+const $chips    = document.getElementById('chips');
+const $grade    = document.getElementById('gradeBtn');
+const $next     = document.getElementById('nextBtn');
+const $reveal   = document.getElementById('revealBtn');
+const $reset    = document.getElementById('resetBtn');
+const $newGame  = document.getElementById('newGameBtn');
+const $scC      = document.getElementById('scoreCorrect');
+const $scI      = document.getElementById('scoreIncorrect');
+
+/* --- Utils --- */
+const shuffle = a => { for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
+const save = () => localStorage.setItem(LS_KEY, JSON.stringify({order, idx, scoreCorrect, scoreIncorrect}));
+const load = () => {
+  const raw = localStorage.getItem(LS_KEY);
+  if(!raw) return false;
+  try{
+    const s = JSON.parse(raw);
+    if(!Array.isArray(s.order) || typeof s.idx!=='number') return false;
+    order = s.order; idx = s.idx; scoreCorrect = s.scoreCorrect||0; scoreIncorrect = s.scoreIncorrect||0;
+    return true;
+  }catch{ return false; }
+};
+const resetAll = () => {
+  order = shuffle([...Array(SENTENCES.length).keys()]);
+  idx = 0; scoreCorrect = 0; scoreIncorrect = 0;
+  save();
+};
+
+/* --- Confetti (cute win effect) --- */
+const confetti = (() => {
+  const cv = document.getElementById('confetti');
+  const ctx = cv.getContext('2d');
+  let parts = [], timer;
+  const resize = () => { cv.width = cv.clientWidth; cv.height = cv.clientHeight; };
+  window.addEventListener('resize', resize); resize();
+  function burst(){
+    parts = Array.from({length:60}).map(() => ({
+      x: cv.width/2, y: cv.height/3, vx:(Math.random()-0.5)*6, vy:Math.random()*-6-2,
+      r: Math.random()*3+2, a:1, vr: (Math.random()-0.5)*0.2
+    }));
+    if(timer) cancelAnimationFrame(timer);
+    loop();
+  }
+  function loop(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    parts.forEach(p=>{
+      p.vy += 0.15; p.x += p.vx; p.y += p.vy; p.a -= 0.01; p.r += p.vr;
+      ctx.globalAlpha = Math.max(p.a,0);
+      ctx.beginPath(); ctx.arc(p.x,p.y,Math.max(p.r,0),0,Math.PI*2); ctx.fillStyle = '#'+(~~(Math.random()*0xFFFFFF)).toString(16).padStart(6,'0'); ctx.fill();
+    });
+    parts = parts.filter(p=>p.a>0 && p.y < cv.height+20);
+    if(parts.length) timer = requestAnimationFrame(loop);
+  }
+  return { burst };
+})();
+
+/* --- Rendering the current card --- */
+function renderCard(){
+  $message.textContent = '';
+  $message.className = 'msg';
+  $next.style.display = 'none';
+  $reveal.style.display = 'inline-block';
+  countedThisCard = false;
+
+  if(idx >= order.length){
+    $sentence.innerHTML = `🎉 All done! You finished ${order.length} sentences. Press <b>New Game</b> to play again.`;
+    $progress.textContent = '';
+    $chips.innerHTML='';
+    return;
+  }
+
+  const s = SENTENCES[order[idx]];
+  const answer = s.answer;
+  const letters = [...answer.toLowerCase()];
+
+  // Build letter input tiles
+  const blank = document.createElement('span'); blank.className = 'blank';
+  blank.setAttribute('role','group'); blank.setAttribute('aria-label','Type the missing word');
+  letters.forEach((_,i)=>{
+    const input = document.createElement('input');
+    input.className = 'tile';
+    input.maxLength = 1;
+    input.inputMode = 'latin';
+    input.autocapitalize = 'none';
+    input.autocomplete = 'off';
+    input.spellcheck = 'false';
+    input.dataset.idx = i;
+    input.addEventListener('input', (e)=>{
+      e.target.value = e.target.value.replace(/[^a-zA-Z’']/g,'').toLowerCase();
+      const next = e.target.nextElementSibling;
+      if(e.target.value && next) next.focus();
+    });
+    input.addEventListener('keydown', (e)=>{
+      if(e.key==='Backspace' && !e.target.value){
+        const prev = e.target.previousElementSibling; if(prev){prev.focus(); prev.value='';}
+      }
+      if(e.key==='ArrowLeft'){ const prev = e.target.previousElementSibling; if(prev) prev.focus(); }
+      if(e.key==='ArrowRight'){ const next = e.target.nextElementSibling; if(next) next.focus(); }
+      if(e.key==='Enter'){ grade(); }
+    });
+    blank.appendChild(input);
+  });
+
+  $sentence.innerHTML='';
+  const pre = document.createTextNode(capitalIfNeeded(s.textBefore) + ' ');
+  const post = document.createTextNode((s.textAfter||''));
+  $sentence.appendChild(pre);
+  $sentence.appendChild(blank);
+  $sentence.appendChild(document.createTextNode(' '));
+  $sentence.appendChild(post);
+
+  // Progress & helper chips
+  $progress.textContent = `Card ${idx+1} of ${order.length}`;
+  $chips.innerHTML = '';
+  $chips.appendChild(chip(`Target word: ${answer.toLowerCase()}`));
+  $chips.appendChild(chip(`Letters: ${letters.length}`));
+
+  // Focus first tile
+  const first = blank.querySelector('.tile'); if(first) first.focus();
+
+  $scC.textContent = String(scoreCorrect);
+  $scI.textContent = String(scoreIncorrect);
+  save();
+}
+
+function capitalIfNeeded(text){
+  // Capitalize first letter if sentence likely starts
+  if(!text) return '';
+  const t = text.trimStart();
+  const cap = t.charAt(0).toUpperCase() + t.slice(1);
+  // preserve leading spaces
+  return text.replace(t, cap);
+}
+
+function chip(text){
+  const el = document.createElement('span');
+  el.className = 'chip';
+  el.textContent = text;
+  return el;
+}
+
+function getTypedWord(){
+  const tiles = [...document.querySelectorAll('.tile')];
+  return tiles.map(t=>t.value.toLowerCase()).join('');
+}
+
+/* --- Grade logic --- */
+function grade(){
+  if(idx >= order.length) return;
+  const s = SENTENCES[order[idx]];
+  const typed = getTypedWord();
+  if(!typed || typed.length !== s.answer.length){
+    $message.textContent = 'Keep going — fill all the boxes first.';
+    $message.className = 'msg';
+    return;
+  }
+  if(typed === s.answer.toLowerCase()){
+    $message.textContent = '✅ Correct! Great job!';
+    $message.className = 'msg good';
+    scoreCorrect += 1;
+    $scC.textContent = String(scoreCorrect);
+    $next.style.display = 'inline-block';
+    $reveal.style.display = 'none';
+    confetti.burst();
+    save();
+  } else {
+    $message.textContent = '❌ Not quite. Try again!';
+    $message.className = 'msg bad';
+    if(!countedThisCard){
+      scoreIncorrect += 1;
+      countedThisCard = true;
+      $scI.textContent = String(scoreIncorrect);
+      save();
+    }
+  }
+}
+
+/* --- Hint --- */
+function revealHint(){
+  const s = SENTENCES[order[idx]];
+  const letters = [...s.answer.toLowerCase()];
+  const tiles = [...document.querySelectorAll('.tile')];
+  // Fill one missing letter (first empty), or the first wrong letter
+  for(let i=0;i<tiles.length;i++){
+    if(!tiles[i].value || tiles[i].value !== letters[i]){
+      tiles[i].value = letters[i];
+      tiles[i].focus();
+      break;
+    }
+  }
+}
+
+/* --- Next --- */
+function nextCard(){
+  if(idx < order.length){ idx += 1; }
+  renderCard();
+}
+
+/* --- New Game & Reset --- */
+$newGame.addEventListener('click', () => { resetAll(); renderCard(); });
+$reset.addEventListener('click', () => {
+  if(confirm('Reset game and clear your saved progress & score?')){
+    localStorage.removeItem(LS_KEY);
+    resetAll(); renderCard();
+  }
+});
+
+/* --- Buttons --- */
+$grade.addEventListener('click', grade);
+$next.addEventListener('click', nextCard);
+$reveal.addEventListener('click', revealHint);
+
+/* --- Resume saved game if present --- */
+if(!load()){ resetAll(); }
+renderCard();
+</script>
+</body>
+</html>
