@@ -44,17 +44,28 @@
       overflow-x: hidden;       /* prevent side scroll */
     }
 
-    header{
-      background:linear-gradient(90deg,var(--primary),#7a74ff);
-      color:#fff;
-      padding:calc(8px + var(--safe-top)) 16px 8px 16px;
-      display:flex;align-items:center;gap:12px;justify-content:space-between;
-      position:sticky;top:0;z-index:10;
-      box-shadow:0 4px 12px rgba(0,0,0,.15);
-    }
+header {
+  background: linear-gradient(90deg,var(--primary),#7a74ff);
+  color: #fff;
+  padding: calc(8px + var(--safe-top)) 16px 8px 16px;
+  display: flex;
+  flex-direction: column;       /* stack children vertically */
+  gap: 8px;                     /* space between brand and nav */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
     .brand{display:flex;align-items:center;gap:12px;min-width:0}
     .brand h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .nav{display:flex;gap:10px;align-items:center;color:#fff;flex-wrap:wrap;justify-content:flex-end}
+.nav {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: #fff;
+  flex-wrap: wrap;
+  justify-content: flex-start;  /* align to left under brand */
+}
     .pill{
       background:rgba(255,255,255,.18);
       padding:6px 10px;border-radius:999px;font-size:13px;white-space:nowrap
