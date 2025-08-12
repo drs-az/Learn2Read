@@ -2,47 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Learn2Read – Fry Words Game</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#6C63FF">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#6C63FF" />
+
   <style>
     :root{
       --bg:#f6f7fb;
       --card:#ffffff;
       --primary:#6C63FF;
-      --primary-2:#9b95ff;
       --accent:#FFB703;
       --good:#06a77d;
       --bad:#e63946;
       --text:#222;
       --muted:#6b7280;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
     *{box-sizing:border-box}
+
+    html, body {
+      height: 100%;
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
+    }
     body{
-      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
       background:
         radial-gradient(70% 50% at 10% 0%, #efeaff 0%, transparent 70%),
         radial-gradient(60% 40% at 90% 10%, #ffe9c7 0%, transparent 60%),
         var(--bg);
       color:var(--text);
-      min-height:100vh;
-      display:flex;flex-direction:column;
+      display:flex;
+      flex-direction:column;
+      min-height:100svh;
+      max-width: 100vw;         /* contain horizontally */
+      overflow-x: hidden;       /* prevent side scroll */
     }
+
     header{
       background:linear-gradient(90deg,var(--primary),#7a74ff);
       color:#fff;
-      padding:10px 16px;
+      padding:calc(8px + var(--safe-top)) 16px 8px 16px;
       display:flex;align-items:center;gap:12px;justify-content:space-between;
       position:sticky;top:0;z-index:10;
       box-shadow:0 4px 12px rgba(0,0,0,.15);
     }
-    .brand{display:flex;align-items:center;gap:12px}
-    .brand h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.3px}
-    .nav{display:flex;gap:10px;align-items:center;color:#fff}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .nav{display:flex;gap:10px;align-items:center;color:#fff;flex-wrap:wrap;justify-content:flex-end}
     .pill{
       background:rgba(255,255,255,.18);
-      padding:6px 10px;border-radius:999px;font-size:13px
+      padding:6px 10px;border-radius:999px;font-size:13px;white-space:nowrap
     }
     .btn{
       border:0;border-radius:12px;padding:10px 16px;font-weight:700;
@@ -52,19 +67,32 @@
     }
     .btn:hover{transform:translateY(-1px)}
     .btn.secondary{background:transparent;color:#fff;border:2px solid #fff}
-    main{flex:1;display:grid;place-items:center;padding:24px}
+    .link-btn{
+      background:transparent;border:none;color:var(--primary);font-weight:800;cursor:pointer;
+      padding:0;text-decoration:underline;
+    }
+
+    main{
+      flex:1;
+      display:grid;place-items:center;
+      padding:16px;
+      padding-bottom: calc(16px + var(--safe-bottom));
+      max-width: 100vw;
+      overflow: auto;           /* allow content scroll within viewport */
+    }
     .card{
-      width:min(900px,95vw); background:var(--card); border-radius:24px; padding:24px;
+      width:min(900px, 96vw);
+      background:var(--card); border-radius:24px; padding:20px;
       box-shadow:0 20px 60px rgba(0,0,0,.12);
       position:relative; overflow:hidden;
     }
-    .subtitle{color:var(--muted);margin:4px 0 16px;font-size:14px}
+    .subtitle{color:var(--muted);margin:4px 0 12px;font-size:14px}
     .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
     .sentence{
-      font-size:26px;line-height:1.4;margin:14px 0 6px;
+      font-size:26px;line-height:1.4;margin:12px 0 6px;word-wrap:break-word;
     }
     .blank{
-      display:inline-flex;gap:6px;vertical-align:middle;margin:0 6px;
+      display:inline-flex;gap:6px;vertical-align:middle;margin:0 6px;flex-wrap:nowrap
     }
     .tile{
       width:46px;height:58px;border-radius:14px;border:2px solid #e5e7eb;background:#f9fafb;
@@ -72,53 +100,102 @@
       caret-color:transparent;outline:none;
       box-shadow:inset 0 -4px 0 #e5e7eb;
     }
+    @media (max-width:420px){
+      .tile{width:38px;height:52px;font-size:24px}
+      .sentence{font-size:22px}
+    }
     .tile:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,99,255,.25), inset 0 -4px 0 #e5e7eb}
-    .actions{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap}
+    .actions{margin-top:16px;display:flex;gap:12px;flex-wrap:wrap}
     .msg{margin-top:12px;font-weight:700}
     .msg.good{color:var(--good)}
     .msg.bad{color:var(--bad)}
-    .progress{margin-top:10px;color:var(--muted);font-size:14px}
+    .progress{margin-top:8px;color:var(--muted);font-size:14px}
     .chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
     .chip{
       font-size:12px;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3
     }
-    footer{padding:18px;text-align:center;color:var(--muted);font-size:12px}
+    footer{padding:12px;text-align:center;color:var(--muted);font-size:12px}
+
     .confetti{position:absolute;inset:0;pointer-events:none}
+
+    /* Dashboard modal */
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,.45);
+      display:none;align-items:center;justify-content:center;z-index:50;padding:16px;
+    }
+    .modal{
+      width:min(900px,96vw);max-height:90svh;overflow:auto;
+      background:#fff;border-radius:20px;padding:20px;
+      box-shadow:0 24px 64px rgba(0,0,0,.3)
+    }
+    .modal h2{margin:0 0 6px 0}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{padding:8px 10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
+    .badge{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:999px;padding:4px 8px;font-size:12px}
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
-      <img src="icons/icon-192.png" alt="" width="32" height="32" style="border-radius:8px;box-shadow:0 3px 8px rgba(0,0,0,.25)">
+      <img src="icon-192.png" alt="" width="32" height="32" style="border-radius:8px;box-shadow:0 3px 8px rgba(0,0,0,.25)">
       <h1>Learn2Read</h1>
       <span class="pill">Fry Instant Words</span>
     </div>
     <div class="nav">
       <button id="newGameBtn" class="btn secondary">New Game</button>
       <button id="resetBtn" class="btn secondary" title="Clears progress & score">Reset Game</button>
+      <button id="dashboardBtn" class="btn secondary" title="Parent dashboard">Dashboard</button>
       <span class="pill">✅ Correct: <b id="scoreCorrect">0</b></span>
       <span class="pill">❌ Incorrect: <b id="scoreIncorrect">0</b></span>
     </div>
   </header>
 
   <main>
-    <div class="card">
+    <div class="card" id="card">
       <canvas class="confetti" id="confetti"></canvas>
 
       <div class="subtitle">Fill in the missing word using letter boxes, then tap <b>Grade</b>.</div>
       <div id="sentence" class="sentence">Press <b>New Game</b> to start.</div>
+
       <div class="actions">
         <button id="gradeBtn" class="btn">Grade</button>
         <button id="nextBtn" class="btn" style="display:none">Next Sentence</button>
         <button id="revealBtn" class="btn" style="display:none">Show Hint</button>
       </div>
-      <div id="message" class="msg"></div>
+
       <div class="progress" id="progress"></div>
-      <div class="chips" id="chips"></div>
+
+      <!-- Reveal toggle: hidden answer chips -->
+      <div style="margin-top:6px">
+        <button id="revealToggle" class="link-btn" style="display:none">Reveal</button>
+      </div>
+      <div class="chips" id="chips" style="display:none"></div>
+
+      <div id="message" class="msg"></div>
     </div>
   </main>
 
-  <footer>Words: Fry Instant Words (600). Source: UEN & Dr. Edward Fry resources.</footer>
+  <footer>Words: Fry Instant Words (goal: 600). Source: UEN & Dr. Edward Fry resources.</footer>
+
+  <!-- Dashboard Modal -->
+  <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dashTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <h2 id="dashTitle">Parent Dashboard</h2>
+        <button id="closeModal" class="btn">Close</button>
+      </div>
+      <p class="subtitle" id="timeOnTask">Time on task: —</p>
+      <h3>Per-Word Accuracy</h3>
+      <table class="table" id="accuracyTable">
+        <thead>
+          <tr><th>Word</th><th>First-Try Correct %</th><th>Attempts</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <h3 style="margin-top:14px">Words to Review</h3>
+      <div id="reviewList" class="chips"></div>
+    </div>
+  </div>
 
 <script>
 /* --- PWA bootstrap --- */
@@ -172,9 +249,8 @@ const FRY_WORDS = [
   "lay","weather","root","instruments","meet","third","months","paragraph","raised","represent"
 ];
 
-// Curated sentence bank (kid-friendly). Each has exactly one missing word from FRY_WORDS.
-// You can easily add more! Format: { textBefore, answer, textAfter }
-const SENTENCES = [
+/* Hand-curated starter sentences (kept; we’ll add auto-generated below) */
+const CURATED = [
   {answer:"the", textBefore:"___ cat is sleeping on the mat", textAfter:"."},
   {answer:"and", textBefore:"Cookies ___ milk are on the table", textAfter:"."},
   {answer:"to", textBefore:"We walk ___ school each day", textAfter:"."},
@@ -261,19 +337,148 @@ const SENTENCES = [
   {answer:"walk", textBefore:"Let’s ___ the dog", textAfter:"."},
   {answer:"white", textBefore:"Snow looks so ___", textAfter:"."}
 ];
-// If you want *more* coverage, add more items above. The game will auto-shuffle them.
 
-/* --- Local storage keys --- */
-const LS_KEY = 'l2r_state_v1';
+/* Auto-generate 200+ cloze sentences tailored by rough part-of-speech buckets.
+   We cover function words with specific patterns; the rest use safe neutral templates. */
+const POS_BUCKETS = {
+  articles: new Set(["the","a","an"]),
+  preps: new Set(["to","in","on","at","by","with","from","into","over","under","between","through","after","before","around","above","below","near","off","up","out","across","during"]),
+  pronouns: new Set(["I","you","he","she","it","we","they","me","him","her","us","them","my","your","his","her","its","our","their"]),
+  beAux: new Set(["am","is","are","was","were"]),
+  modals: new Set(["can","will","would","could","should","may","might","must","shall"]),
+  conj: new Set(["and","but","or","so","because","if","when","while","though","after","before","until"]),
+  det: new Set(["this","that","these","those","some","any","each","every","no"]),
+};
 
-/* --- State --- */
+function buildSentenceFor(word){
+  const w = word;
+  const wl = w.toLowerCase();
+
+  // ARTICLES
+  if (POS_BUCKETS.articles.has(wl)){
+    return {answer: wl, textBefore:"___ puppy is sleeping", textAfter:"."};
+  }
+  // PREPOSITIONS
+  if (POS_BUCKETS.preps.has(wl)){
+    const map = {
+      "to": {b:"We walked ___ the park",a:"."},
+      "in": {b:"Put the crayons ___ the box",a:"."},
+      "on": {b:"Keep your hands ___ the rail",a:"."},
+      "at": {b:"Meet me ___ the library",a:"."},
+      "by": {b:"Stand ___ the door",a:"."},
+      "with": {b:"I like pancakes ___ syrup",a:"."},
+      "from": {b:"This note is ___ Mom",a:"."},
+      "into": {b:"Step ___ the circle",a:"."},
+      "over": {b:"Jump ___ the puddle",a:"!"},
+      "under": {b:"The cat hides ___ the table",a:"."},
+      "between": {b:"The ball rolled ___ the chairs",a:"."},
+      "through": {b:"Walk ___ the tunnel",a:"."},
+      "after": {b:"We will play ___ lunch",a:"."},
+      "before": {b:"Wash hands ___ dinner",a:"."},
+      "around": {b:"Run ___ the cones",a:"."},
+      "above": {b:"The kite flew ___ the trees",a:"."},
+      "below": {b:"The fish swim ___ the dock",a:"."},
+      "near": {b:"Sit ___ your friends",a:"."},
+      "off": {b:"Please turn ___ the light",a:"."},
+      "up": {b:"Climb ___ the ladder",a:"."},
+      "out": {b:"Take the trash ___",a:"."},
+      "across": {b:"Look both ways ___ the street",a:"."},
+      "during": {b:"Stay quiet ___ the show",a:"."}
+    };
+    const t = map[wl] || {b:"We go ___ the park",a:"."};
+    return {answer: wl, textBefore:t.b.replace("___", "___"), textAfter:t.a};
+  }
+  // PRONOUNS / DETERMINERS
+  if (POS_BUCKETS.pronouns.has(w)) return {answer: wl, textBefore:"___ will share the blocks", textAfter:"."};
+  if (POS_BUCKETS.det.has(wl)) return {answer: wl, textBefore:"___ cookie fell on the plate", textAfter:"."};
+
+  // BE verbs
+  if (POS_BUCKETS.beAux.has(wl)){
+    const map = {
+      "am": {b:"I ___ ready to read",a:"!"},
+      "is": {b:"The soup ___ hot",a:"."},
+      "are": {b:"We ___ on time",a:"."},
+      "was": {b:"It ___ raining yesterday",a:"."},
+      "were": {b:"We ___ at the park",a:"."}
+    };
+    const t = map[wl];
+    if (t) return {answer: wl, textBefore:t.b, textAfter:t.a};
+  }
+
+  // MODALS
+  if (POS_BUCKETS.modals.has(wl)){
+    return {answer: wl, textBefore:`I ___ try again`, textAfter:"."};
+  }
+
+  // CONJUNCTIONS
+  if (POS_BUCKETS.conj.has(wl)){
+    const map = {
+      "and": {b:"I like apples ___ bananas",a:"."},
+      "but": {b:"I want to play ___ it’s late",a:"."},
+      "or": {b:"Do you want milk ___ water",a:"?"},
+      "so": {b:"It’s raining, ___ we’ll stay inside",a:"."},
+      "because": {b:"I smiled ___ it’s your birthday",a:"."},
+      "if": {b:"___ you’re ready, we can go",a:"."},
+      "when": {b:"I clap ___ the song ends",a:"."},
+      "while": {b:"Read quietly ___ we wait",a:"."},
+      "though": {b:"I tried, ___ it was hard",a:"."},
+      "after": {b:"Brush teeth ___ dinner",a:"."},
+      "before": {b:"Pack your bag ___ school",a:"."},
+      "until": {b:"Wait here ___ the light turns green",a:"."}
+    };
+    const t = map[wl] || {b:"I read ___ I rest",a:"."};
+    return {answer: wl, textBefore:t.b, textAfter:t.a};
+  }
+
+  // Common verbs/nouns/adjectives fallback (safe & natural)
+  // We keep it simple and age-appropriate:
+  const genericPatterns = [
+    {b:"I saw ___ on the page", a:"."},
+    {b:"We say ___ together", a:"."},
+    {b:"Write the word ___", a:"."},
+    {b:"Can you read ___ out loud", a:"?"},
+    {b:"Point to ___ in your book", a:"."},
+    {b:"Spell ___ using the letter tiles", a:"."},
+    {b:"Use ___ in a sentence", a:"."}
+  ];
+  const pick = genericPatterns[Math.floor(Math.random()*genericPatterns.length)];
+  return {answer: wl, textBefore: pick.b, textAfter: pick.a};
+}
+
+/* Build a large deck: curated + 220 auto-generated unique words */
+function buildAutoDeck(){
+  const used = new Set(CURATED.map(s=>s.answer.toLowerCase()));
+  const autos = [];
+  for (let i=0;i<FRY_WORDS.length && autos.length<220;i++){
+    const w = FRY_WORDS[i];
+    const wl = w.toLowerCase();
+    if (used.has(wl)) continue;
+    const s = buildSentenceFor(w);
+    // Ensure reasonable sentence and not too short:
+    if (s && s.answer && s.textBefore && (s.textBefore.length + (s.textAfter||'').length) >= 10){
+      autos.push(s);
+      used.add(wl);
+    }
+  }
+  return autos;
+}
+
+const SENTENCES = [...CURATED, ...buildAutoDeck()];
+
+/* ---------------- State & Storage ------------------ */
+const LS_STATE = 'l2r_state_v2';
+const LS_METRIC = 'l2r_metrics_v1';
+
 let order = [];           // shuffled indexes for SENTENCES
-let idx = 0;              // current position in order
+let idx = 0;              // current position
 let scoreCorrect = 0;
 let scoreIncorrect = 0;
-let countedThisCard = false; // whether we've already counted an incorrect for the current card
+let countedThisCard = false;
 
-/* --- Elements --- */
+const metrics = loadMetrics(); // { startedAt, totalMs, words:{[word]:{attempts, firstWrong, firstTryCorrect}} , review:Set }
+let sessionStart = Date.now();
+
+/* Elements */
 const $sentence = document.getElementById('sentence');
 const $message  = document.getElementById('message');
 const $progress = document.getElementById('progress');
@@ -285,12 +490,23 @@ const $reset    = document.getElementById('resetBtn');
 const $newGame  = document.getElementById('newGameBtn');
 const $scC      = document.getElementById('scoreCorrect');
 const $scI      = document.getElementById('scoreIncorrect');
+const $confetti = document.getElementById('confetti');
+const $revealToggle = document.getElementById('revealToggle');
+const $dashboardBtn = document.getElementById('dashboardBtn');
+const $modalBackdrop = document.getElementById('modalBackdrop');
+const $closeModal = document.getElementById('closeModal');
+const $timeOnTask = document.getElementById('timeOnTask');
+const $accTableBody = document.querySelector('#accuracyTable tbody');
+const $reviewList = document.getElementById('reviewList');
 
-/* --- Utils --- */
+/* Utils */
 const shuffle = a => { for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
-const save = () => localStorage.setItem(LS_KEY, JSON.stringify({order, idx, scoreCorrect, scoreIncorrect}));
-const load = () => {
-  const raw = localStorage.getItem(LS_KEY);
+function save(){
+  localStorage.setItem(LS_STATE, JSON.stringify({order, idx, scoreCorrect, scoreIncorrect}));
+  saveMetrics();
+}
+function load(){
+  const raw = localStorage.getItem(LS_STATE);
   if(!raw) return false;
   try{
     const s = JSON.parse(raw);
@@ -298,16 +514,44 @@ const load = () => {
     order = s.order; idx = s.idx; scoreCorrect = s.scoreCorrect||0; scoreIncorrect = s.scoreIncorrect||0;
     return true;
   }catch{ return false; }
-};
-const resetAll = () => {
+}
+function resetAll(){
   order = shuffle([...Array(SENTENCES.length).keys()]);
   idx = 0; scoreCorrect = 0; scoreIncorrect = 0;
   save();
-};
+}
 
-/* --- Confetti (cute win effect) --- */
+/* Metrics */
+function loadMetrics(){
+  const raw = localStorage.getItem(LS_METRIC);
+  if(!raw){
+    return { startedAt: Date.now(), totalMs: 0, words:{}, review:{} };
+  }
+  try{
+    const m = JSON.parse(raw);
+    if (!m.words) m.words = {};
+    if (!m.review) m.review = {};
+    if (!m.startedAt) m.startedAt = Date.now();
+    if (typeof m.totalMs !== 'number') m.totalMs = 0;
+    return m;
+  } catch {
+    return { startedAt: Date.now(), totalMs: 0, words:{}, review:{} };
+  }
+}
+function saveMetrics(){
+  localStorage.setItem(LS_METRIC, JSON.stringify(metrics));
+}
+function addTime(){
+  const now = Date.now();
+  metrics.totalMs += (now - sessionStart);
+  sessionStart = now;
+  saveMetrics();
+}
+window.addEventListener('beforeunload', addTime);
+
+/* Confetti */
 const confetti = (() => {
-  const cv = document.getElementById('confetti');
+  const cv = $confetti;
   const ctx = cv.getContext('2d');
   let parts = [], timer;
   const resize = () => { cv.width = cv.clientWidth; cv.height = cv.clientHeight; };
@@ -333,7 +577,7 @@ const confetti = (() => {
   return { burst };
 })();
 
-/* --- Rendering the current card --- */
+/* Render */
 function renderCard(){
   $message.textContent = '';
   $message.className = 'msg';
@@ -341,18 +585,24 @@ function renderCard(){
   $reveal.style.display = 'inline-block';
   countedThisCard = false;
 
+  // reveal chips reset
+  $chips.style.display = 'none';
+  $revealToggle.style.display = 'inline';
+  $revealToggle.textContent = 'Reveal';
+
   if(idx >= order.length){
     $sentence.innerHTML = `🎉 All done! You finished ${order.length} sentences. Press <b>New Game</b> to play again.`;
     $progress.textContent = '';
     $chips.innerHTML='';
+    $revealToggle.style.display = 'none';
     return;
   }
 
   const s = SENTENCES[order[idx]];
-  const answer = s.answer;
-  const letters = [...answer.toLowerCase()];
+  const answer = s.answer.toLowerCase();
+  const letters = [...answer];
 
-  // Build letter input tiles
+  // Build letter tiles
   const blank = document.createElement('span'); blank.className = 'blank';
   blank.setAttribute('role','group'); blank.setAttribute('aria-label','Type the missing word');
   letters.forEach((_,i)=>{
@@ -388,13 +638,12 @@ function renderCard(){
   $sentence.appendChild(document.createTextNode(' '));
   $sentence.appendChild(post);
 
-  // Progress & helper chips
   $progress.textContent = `Card ${idx+1} of ${order.length}`;
+
   $chips.innerHTML = '';
-  $chips.appendChild(chip(`Target word: ${answer.toLowerCase()}`));
+  $chips.appendChild(chip(`Target word: ${answer}`));
   $chips.appendChild(chip(`Letters: ${letters.length}`));
 
-  // Focus first tile
   const first = blank.querySelector('.tile'); if(first) first.focus();
 
   $scC.textContent = String(scoreCorrect);
@@ -403,44 +652,59 @@ function renderCard(){
 }
 
 function capitalIfNeeded(text){
-  // Capitalize first letter if sentence likely starts
   if(!text) return '';
   const t = text.trimStart();
   const cap = t.charAt(0).toUpperCase() + t.slice(1);
-  // preserve leading spaces
   return text.replace(t, cap);
 }
-
 function chip(text){
   const el = document.createElement('span');
   el.className = 'chip';
   el.textContent = text;
   return el;
 }
-
 function getTypedWord(){
   const tiles = [...document.querySelectorAll('.tile')];
   return tiles.map(t=>t.value.toLowerCase()).join('');
 }
 
-/* --- Grade logic --- */
+/* Grade logic with metrics */
+function ensureWordMetric(word){
+  if(!metrics.words[word]) metrics.words[word] = { attempts:0, firstWrong:0, firstTryCorrect:0 };
+}
 function grade(){
   if(idx >= order.length) return;
   const s = SENTENCES[order[idx]];
+  const answer = s.answer.toLowerCase();
   const typed = getTypedWord();
-  if(!typed || typed.length !== s.answer.length){
+
+  ensureWordMetric(answer);
+
+  if(!typed || typed.length !== answer.length){
     $message.textContent = 'Keep going — fill all the boxes first.';
     $message.className = 'msg';
     return;
   }
-  if(typed === s.answer.toLowerCase()){
+
+  // Count attempt for metrics (first click on Grade per card is an attempt)
+  if (metrics.words[answer]._countedAttemptForIdx !== idx) {
+    metrics.words[answer].attempts += 1;
+    metrics.words[answer]._countedAttemptForIdx = idx;
+  }
+
+  if(typed === answer){
     $message.textContent = '✅ Correct! Great job!';
     $message.className = 'msg good';
+    // If this was the first attempt for this card, mark firstTryCorrect
+    if (!countedThisCard) {
+      metrics.words[answer].firstTryCorrect += 1;
+    }
     scoreCorrect += 1;
     $scC.textContent = String(scoreCorrect);
     $next.style.display = 'inline-block';
     $reveal.style.display = 'none';
     confetti.burst();
+    saveMetrics();
     save();
   } else {
     $message.textContent = '❌ Not quite. Try again!';
@@ -449,17 +713,20 @@ function grade(){
       scoreIncorrect += 1;
       countedThisCard = true;
       $scI.textContent = String(scoreIncorrect);
+      metrics.words[answer].firstWrong += 1;
+      metrics.review[answer] = true;   // add to review set
+      saveMetrics();
       save();
     }
   }
 }
 
-/* --- Hint --- */
+/* Hint */
 function revealHint(){
+  if(idx >= order.length) return;
   const s = SENTENCES[order[idx]];
   const letters = [...s.answer.toLowerCase()];
   const tiles = [...document.querySelectorAll('.tile')];
-  // Fill one missing letter (first empty), or the first wrong letter
   for(let i=0;i<tiles.length;i++){
     if(!tiles[i].value || tiles[i].value !== letters[i]){
       tiles[i].value = letters[i];
@@ -469,27 +736,80 @@ function revealHint(){
   }
 }
 
-/* --- Next --- */
+/* Next */
 function nextCard(){
   if(idx < order.length){ idx += 1; }
   renderCard();
 }
 
-/* --- New Game & Reset --- */
-$newGame.addEventListener('click', () => { resetAll(); renderCard(); });
-$reset.addEventListener('click', () => {
-  if(confirm('Reset game and clear your saved progress & score?')){
-    localStorage.removeItem(LS_KEY);
+/* Reveal toggle */
+$revealToggle.addEventListener('click', ()=>{
+  if ($chips.style.display === 'none'){
+    $chips.style.display = 'flex';
+    $revealToggle.textContent = 'Hide';
+  } else {
+    $chips.style.display = 'none';
+    $revealToggle.textContent = 'Reveal';
+  }
+});
+
+/* New Game & Reset */
+document.getElementById('newGameBtn').addEventListener('click', () => { resetAll(); renderCard(); });
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if(confirm('Reset game and clear your saved progress, scores, and metrics?')){
+    localStorage.removeItem(LS_STATE);
+    localStorage.removeItem(LS_METRIC);
+    Object.assign(metrics, { startedAt: Date.now(), totalMs: 0, words:{}, review:{} });
     resetAll(); renderCard();
   }
 });
 
-/* --- Buttons --- */
+/* Buttons */
 $grade.addEventListener('click', grade);
 $next.addEventListener('click', nextCard);
 $reveal.addEventListener('click', revealHint);
 
-/* --- Resume saved game if present --- */
+/* Dashboard */
+$dashboardBtn.addEventListener('click', openDashboard);
+$closeModal.addEventListener('click', closeDashboard);
+$modalBackdrop.addEventListener('click', (e)=>{ if(e.target === $modalBackdrop) closeDashboard(); });
+
+function openDashboard(){
+  addTime(); // flush time so far into totalMs
+  // Time on task
+  const mins = Math.round(metrics.totalMs / 60000);
+  $timeOnTask.textContent = `Time on task: ${mins} minute${mins===1?'':'s'}`;
+
+  // Build accuracy rows
+  const entries = Object.entries(metrics.words)
+    .filter(([w,obj]) => !w.startsWith('_')) // skip internal flags
+    .map(([w,obj]) => {
+      const attempts = obj.attempts || 0;
+      const firstTry = obj.firstTryCorrect || 0;
+      const pct = attempts ? Math.round((firstTry/attempts)*100) : 0;
+      return {word:w, attempts, pct};
+    })
+    .sort((a,b)=> a.word.localeCompare(b.word));
+
+  $accTableBody.innerHTML = entries.map(r =>
+    `<tr><td>${r.word}</td><td>${r.pct}%</td><td>${r.attempts}</td></tr>`
+  ).join('') || `<tr><td colspan="3">Play a bit to see stats.</td></tr>`;
+
+  // Review chips
+  const reviewWords = Object.keys(metrics.review||{}).sort();
+  $reviewList.innerHTML = reviewWords.length
+    ? reviewWords.map(w=>`<span class="chip">${w}</span>`).join('')
+    : '<span class="badge">No words to review yet 🎉</span>';
+
+  $modalBackdrop.style.display = 'flex';
+  $modalBackdrop.setAttribute('aria-hidden','false');
+}
+function closeDashboard(){
+  $modalBackdrop.style.display = 'none';
+  $modalBackdrop.setAttribute('aria-hidden','true');
+}
+
+/* Resume or start fresh */
 if(!load()){ resetAll(); }
 renderCard();
 </script>
