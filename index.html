@@ -428,9 +428,9 @@ const CURATED = [
   {answer:"white", textBefore:"Snow looks so ___", textAfter:"."}
 ];
 
-/* ========= Natural Language Cloze Generator (POS-aware) ========= */
 
-/* 1) Categorize common FUNCTION WORDS (covers most awkward cases) */
+/* ========= Natural Language Cloze Generator (POS-aware + contexts) ========= */
+
 const CAT = {
   ARTICLE: 'article',
   DEMONSTRATIVE: 'demonstrative',
@@ -450,7 +450,7 @@ const CAT = {
   NOUN: 'noun',
   VERB: 'verb',
   ADJ: 'adjective',
-  META: 'meta',         // generic "read/write/say the word ___" style
+  META: 'meta'
 };
 
 const SETS = {
@@ -470,49 +470,10 @@ const SETS = {
   negation: new Set(['no',"don't","didn’t","didn't","can’t","cant","cannot","won’t","wouldn’t","shouldn’t"]),
   number: new Set(['one','two','three','four','five','six','seven','eight','nine','ten','hundred','thousand'])
 };
-/* Specialized content-word lists (subset of Fry words) */
-const FRY_NOUNS = new Set([
-  'river','water','school','father','mother','city','earth','tree','story','paper','car',
-  'night','day','hand','home','boy','girl','door','table','room','book','dog','horse',
-  'birds','music','color','sun','fish','area','mark','problem','family','body','friend',
-  'children','group','world','america','country','plant','page','letter','point'
-]);
-const FRY_VERBS = new Set([
-  'run','walk','play','read','write','make','see','look','come','go','get','find','start',
-  'keep','learn','spell','help','show','tell','try','move','ask','follow','carry','grow',
-  'took','took','took','bring','gave','wait','open','close','change'
-]);
-const FRY_ADJECTIVES = new Set([
-  'big','small','little','new','old','good','great','high','long','short','white','black',
-  'red','best','better','early','fast','low','real','young','happy'
-]);
 
-
-/* 2) Kid-friendly TEMPLATES for each category.
-      Each string contains "___" where the missing word goes. */
+/* Kid-friendly templates by category */
 const TEMPLATES = {
-  [CAT.NOUN]: [
-    'The ___ is big.',
-    'I saw the ___ today.',
-    'We crossed the ___.',
-    'The ___ is on the map.',
-    'Please draw the ___.'
-  ],
-  [CAT.VERB]: [
-    'I like to ___ fast.',
-    'We will ___ to the park.',
-    'Can you ___ with me?',
-    'Please ___ your name.',
-    'Do not ___ in the hall.'
-  ],
-  [CAT.ADJ]: [
-    'The house is ___.',
-    'This is a ___ book.',
-    'We had a ___ day.',
-    'That is a ___ idea.',
-    'The road is ___ and safe.'
-  ],
-[CAT.ARTICLE]: [
+  [CAT.ARTICLE]: [
     "___ dog ran fast.",
     "I saw ___ bird in the tree.",
     "Please hand me ___ book."
@@ -593,16 +554,160 @@ const TEMPLATES = {
     "Point to ___ in your book.",
     "Use ___ in a sentence.",
     "Spell ___ with letter tiles."
+  ],
+  [CAT.NOUN]: [
+    "The ___ is big.",
+    "I saw the ___ today.",
+    "Please draw the ___."
+  ],
+  [CAT.VERB]: [
+    "I like to ___ fast.",
+    "We will ___ to the park.",
+    "Can you ___ with me?"
+  ],
+  [CAT.ADJ]: [
+    "The house is ___.",
+    "This is a ___ book.",
+    "We had a ___ day."
   ]
 };
 
-/* 3) Categorizer: maps a word to its best-fit category for early reading */
+/* Word-Specific Context Templates (collocations) */
+const NOUN_CONTEXTS = {
+  river: ["The ___ is wide.", "We crossed the ___.", "The ___ flows past the town."],
+  water: ["Drink your ___ after play.", "The ___ is cold.", "Please pour the ___ carefully."],
+  school: ["We walked to ___ today.", "I like my ___.", "Our ___ is near the park."],
+  father: ["My ___ is cooking dinner.", "I went with my ___ to the store."],
+  mother: ["My ___ reads to me.", "I hugged my ___."],
+  city: ["The ___ is very big.", "We live in a busy ___."],
+  earth: ["The ___ goes around the sun.", "We live on the ___."],
+  tree: ["The ___ is tall.", "A bird sits in the ___."],
+  story: ["Read the ___ out loud.", "That ___ is funny."],
+  paper: ["Write your name on the ___.", "Fold the ___ in half."],
+  car: ["Get in the ___.", "The ___ is red."],
+  night: ["Good ___, sleep well.", "At ___ the stars come out."],
+  day: ["It is a sunny ___.", "We had a fun ___."],
+  hand: ["Raise your ___.", "Wash your ___ before lunch."],
+  home: ["We are going ___.", "I like to be at ___."],
+  boy: ["The ___ kicks the ball.", "That ___ is my friend."],
+  girl: ["The ___ is reading.", "That ___ is kind."],
+  door: ["Please open the ___.", "Close the ___ softly."],
+  table: ["Put the crayons on the ___.", "We eat at the ___."],
+  room: ["Clean your ___, please.", "The ___ is quiet."],
+  book: ["Pick a ___ to read.", "This ___ is new."],
+  dog: ["The ___ barked loudly.", "I walked the ___."],
+  horse: ["The ___ runs fast.", "We saw a ___ at the farm."],
+  birds: ["The ___ sing in the tree.", "I see two ___ in the sky."],
+  music: ["The ___ is very soft.", "I like to dance to the ___."],
+  color: ["Blue is my favorite ___.", "What ___ is your bike?"],
+  sun: ["The ___ is bright.", "Do not look at the ___."],
+  fish: ["The ___ swims in the pond.", "We fed the ___."],
+  family: ["My ___ eats dinner together.", "I love my ___."],
+  body: ["Your ___ needs rest.", "Move your ___ to the music."],
+  friend: ["My ___ is kind.", "I will help my ___."],
+  children: ["The ___ lined up.", "The ___ are playing tag."],
+  group: ["Our ___ works together.", "Join the ___ over there."],
+  world: ["The ___ is big.", "We learn about the ___."],
+  country: ["Our ___ has many cities.", "This ___ is far away."],
+  plant: ["The ___ needs water.", "A new ___ is growing."],
+  page: ["Turn the ___.", "Find the ___ with the picture."],
+  letter: ["Write one ___ here.", "What ___ comes next?"],
+  point: ["Please ___ to the map.", "Find the high ___ on the line."]
+};
+
+const VERB_CONTEXTS = {
+  run: ["I like to ___ fast.", "We will ___ to the park."],
+  walk: ["Let’s ___ to class.", "We ___ across the field."],
+  play: ["We will ___ the game.", "Can you ___ with me?"],
+  read: ["Please ___ the book.", "We ___ together every night."],
+  write: ["___ your name.", "Can you ___ a sentence?"],
+  make: ["Let’s ___ a card for Grandma.", "We ___ a big tower."],
+  see: ["Can you ___ the rainbow?", "I ___ a bird."],
+  look: ["___ both ways before crossing.", "___ at the board."],
+  come: ["Please ___ here.", "Can you ___ to my desk?"],
+  go: ["Ready, set, ___!", "We ___ to the library."],
+  get: ["___ your coat.", "I will ___ my pencil."],
+  find: ["Can you ___ the page?", "Let’s ___ your shoes."],
+  start: ["___ the game.", "We will ___ after lunch."],
+  keep: ["___ your hands on the rail.", "Please ___ trying."],
+  learn: ["___ to spell this word.", "We will ___ new things."],
+  spell: ["Please ___ the word.", "Can you ___ your name?"],
+  help: ["Please ___ me zip this.", "Can you ___ your friend?"],
+  show: ["___ me your drawing.", "Please ___ us the answer."],
+  tell: ["___ me your idea.", "Can you ___ a story?"],
+  try: ["___ again.", "Let’s ___ this one."],
+  move: ["___ your piece forward.", "Please ___ your chair."],
+  ask: ["___ a question.", "You can ___ for help."],
+  follow: ["___ the line.", "Please ___ the rules."],
+  carry: ["___ the box carefully.", "Can you ___ this bag?"],
+  grow: ["Plants ___ in the sun.", "Children ___ each year."],
+  bring: ["___ your book to class.", "Please ___ a pencil."],
+  give: ["___ me five!", "Please ___ the note to Mom."],
+  wait: ["___ for the light.", "Please ___ your turn."],
+  open: ["___ the door.", "___ your book to page two."],
+  close: ["___ the door softly.", "Please ___ your eyes."],
+  change: ["___ your seat.", "The leaves ___ color."]
+};
+
+const ADJECTIVE_CONTEXTS = {
+  big: ["The dog is ___.", "We saw a ___ tree."],
+  small: ["The cat is ___.", "This is a ___ bug."],
+  little: ["The ___ bird can fly.", "He has a ___ car."],
+  new: ["This is a ___ book.", "I got a ___ backpack."],
+  old: ["That is an ___ car.", "We live in an ___ house."],
+  good: ["You did a ___ job.", "That is a ___ idea."],
+  great: ["You made a ___ choice.", "It was a ___ game."],
+  high: ["The kite is ___.", "We climbed the ___ hill."],
+  long: ["It is a ___ road.", "Read the ___ story."],
+  short: ["It is a ___ line.", "This is a ___ note."],
+  white: ["The snow is ___.", "I saw a ___ bird."],
+  black: ["The cat is ___.", "He wore a ___ hat."],
+  red: ["The door is ___.", "She has a ___ ball."],
+  best: ["You are my ___ friend.", "That was the ___ part."],
+  better: ["This plan is ___.", "I feel ___ today."],
+  early: ["It is ___ in the morning.", "We arrived ___. "],
+  fast: ["He is a ___ runner.", "That car is ___."],
+  low: ["The cloud is ___.", "Keep the sound ___."],
+  real: ["This is a ___ story.", "Is the coin ___?"],
+  young: ["The ___ boy is six.", "They are still ___."],
+  happy: ["She is ___.", "We had a ___ day."]
+};
+
+const PREPOSITION_OBJECTS = {
+  in: ["the box","the room","the backpack"],
+  on: ["the table","the page","the line"],
+  at: ["the park","the door","the desk"],
+  by: ["the door","the window","the gate"],
+  with: ["a friend","your sister","your class"],
+  from: ["home","the store","Grandma"],
+  into: ["the circle","the pool","the house"],
+  over: ["the puddle","the hill","the fence"],
+  under: ["the table","the bed","the tree"],
+  between: ["two chairs","the cones","the lines"],
+  through: ["the tunnel","the gate","the crowd"],
+  after: ["lunch","the game","the movie"],
+  before: ["school","bedtime","dinner"],
+  around: ["the cones","the block","the park"],
+  above: ["the trees","the clouds","the roof"],
+  below: ["the dock","the hill","the bridge"],
+  near: ["your friends","the bench","the sign"],
+  off: ["the light","the heater","the fan"],
+  up: ["the ladder","the steps","the hill"],
+  out: ["the door","the box","the bag"],
+  across: ["the street","the yard","the bridge"],
+  during: ["the show","the test","the movie"],
+  toward: ["the goal","the stage","the finish line"],
+  to: ["the library","class","the park"]
+};
+
+/* Categorizer */
 function categorizeWord(raw) {
   const w = raw.toLowerCase();
-    if (FRY_NOUNS.has(w)) return CAT.NOUN;
-  if (FRY_VERBS.has(w)) return CAT.VERB;
-  if (FRY_ADJECTIVES.has(w)) return CAT.ADJ;
-if (SETS.article.has(w)) return CAT.ARTICLE;
+  if (NOUN_CONTEXTS[w]) return CAT.NOUN;
+  if (VERB_CONTEXTS[w]) return CAT.VERB;
+  if (ADJECTIVE_CONTEXTS[w]) return CAT.ADJ;
+
+  if (SETS.article.has(w)) return CAT.ARTICLE;
   if (SETS.demonstrative.has(w)) return CAT.DEMONSTRATIVE;
   if (SETS.determiner.has(w)) return CAT.DETERMINER;
   if (SETS.pronounSubj.has(w)) return CAT.PRONOUN_SUBJ;
@@ -617,24 +722,52 @@ if (SETS.article.has(w)) return CAT.ARTICLE;
   if (SETS.adverb.has(w)) return CAT.ADVERB;
   if (SETS.negation.has(w)) return CAT.NEGATION;
   if (SETS.number.has(w)) return CAT.NUMBER;
-  return CAT.META; // safe default that always sounds natural
+  return CAT.META;
 }
 
-/* 4) Build a single logical sentence for a given word */
+/* Build sentence */
 function buildSentenceFor(word) {
-  const cat = categorizeWord(word);
+  const w = word.toLowerCase();
+
+  // 1) Word-specific contexts
+  if (NOUN_CONTEXTS[w]) {
+    const s = NOUN_CONTEXTS[w][Math.floor(Math.random()*NOUN_CONTEXTS[w].length)];
+    const [b,a=''] = s.split('___');
+    return { answer:w, textBefore:b.trim(), textAfter:a.trim() };
+  }
+  if (VERB_CONTEXTS[w]) {
+    const s = VERB_CONTEXTS[w][Math.floor(Math.random()*VERB_CONTEXTS[w].length)];
+    const [b,a=''] = s.split('___');
+    return { answer:w, textBefore:b.trim(), textAfter:a.trim() };
+  }
+  if (ADJECTIVE_CONTEXTS[w]) {
+    const s = ADJECTIVE_CONTEXTS[w][Math.floor(Math.random()*ADJECTIVE_CONTEXTS[w].length)];
+    const [b,a=''] = s.split('___');
+    return { answer:w, textBefore:b.trim(), textAfter:a.trim() };
+  }
+
+  // 2) Prepositions with object bank
+  if (SETS.preposition.has(w)) {
+    const objs = PREPOSITION_OBJECTS[w] || ["the box"];
+    const obj = objs[Math.floor(Math.random()*objs.length)];
+    const template = "The ball is ___ " + obj + ".";
+    const [b,a=''] = template.split('___');
+    return { answer:w, textBefore:b.trim(), textAfter:a.trim() };
+  }
+
+  // 3) Category-based template fallback
+  const cat = categorizeWord(w);
   const list = TEMPLATES[cat] || TEMPLATES[CAT.META];
   const template = list[Math.floor(Math.random() * list.length)];
   const [before, after=''] = template.split('___');
-  return { answer: word.toLowerCase(), textBefore: before.trim(), textAfter: after.trim() };
+  return { answer: w, textBefore: before.trim(), textAfter: after.trim() };
 }
 
-/* 5) Build a large deck: curated + N auto-generated (all logical) */
+/* Build a large deck */
 function buildAutoDeck(n = 300) {
   const used = new Set(CURATED.map(s => s.answer.toLowerCase()));
   const autos = [];
-  const pool = [...FRY_WORDS].sort(() => Math.random() - 0.5); // shuffle
-
+  const pool = [...FRY_WORDS].sort(() => Math.random() - 0.5);
   for (const w of pool) {
     const wl = w.toLowerCase();
     if (used.has(wl)) continue;
@@ -648,8 +781,119 @@ function buildAutoDeck(n = 300) {
   return autos;
 }
 
-/* 6) Rebuild the SENTENCES deck using curated + logical autos */
+/* Rebuild the deck */
 const SENTENCES = [...CURATED, ...buildAutoDeck(300)];
+
+
+
+
+/* Auto-generate 200+ cloze sentences tailored by rough part-of-speech buckets.
+   We cover function words with specific patterns; the rest use safe neutral templates. */
+const POS_BUCKETS = {
+  articles: new Set(["the","a","an"]),
+  preps: new Set(["to","in","on","at","by","with","from","into","over","under","between","through","after","before","around","above","below","near","off","up","out","across","during"]),
+  pronouns: new Set(["I","you","he","she","it","we","they","me","him","her","us","them","my","your","his","her","its","our","their"]),
+  beAux: new Set(["am","is","are","was","were"]),
+  modals: new Set(["can","will","would","could","should","may","might","must","shall"]),
+  conj: new Set(["and","but","or","so","because","if","when","while","though","after","before","until"]),
+  det: new Set(["this","that","these","those","some","any","each","every","no"]),
+};
+
+;
+  }
+  // PREPOSITIONS
+  if (POS_BUCKETS.preps.has(wl)){
+    const map = {
+      "to": {b:"We walked ___ the park",a:"."},
+      "in": {b:"Put the crayons ___ the box",a:"."},
+      "on": {b:"Keep your hands ___ the rail",a:"."},
+      "at": {b:"Meet me ___ the library",a:"."},
+      "by": {b:"Stand ___ the door",a:"."},
+      "with": {b:"I like pancakes ___ syrup",a:"."},
+      "from": {b:"This note is ___ Mom",a:"."},
+      "into": {b:"Step ___ the circle",a:"."},
+      "over": {b:"Jump ___ the puddle",a:"!"},
+      "under": {b:"The cat hides ___ the table",a:"."},
+      "between": {b:"The ball rolled ___ the chairs",a:"."},
+      "through": {b:"Walk ___ the tunnel",a:"."},
+      "after": {b:"We will play ___ lunch",a:"."},
+      "before": {b:"Wash hands ___ dinner",a:"."},
+      "around": {b:"Run ___ the cones",a:"."},
+      "above": {b:"The kite flew ___ the trees",a:"."},
+      "below": {b:"The fish swim ___ the dock",a:"."},
+      "near": {b:"Sit ___ your friends",a:"."},
+      "off": {b:"Please turn ___ the light",a:"."},
+      "up": {b:"Climb ___ the ladder",a:"."},
+      "out": {b:"Take the trash ___",a:"."},
+      "across": {b:"Look both ways ___ the street",a:"."},
+      "during": {b:"Stay quiet ___ the show",a:"."}
+    };
+    const t = map[wl] || {b:"We go ___ the park",a:"."};
+    return {answer: wl, textBefore:t.b.replace("___", "___"), textAfter:t.a};
+  }
+  // PRONOUNS / DETERMINERS
+  if (POS_BUCKETS.pronouns.has(w)) return {answer: wl, textBefore:"___ will share the blocks", textAfter:"."};
+  if (POS_BUCKETS.det.has(wl)) return {answer: wl, textBefore:"___ cookie fell on the plate", textAfter:"."};
+
+  // BE verbs
+  if (POS_BUCKETS.beAux.has(wl)){
+    const map = {
+      "am": {b:"I ___ ready to read",a:"!"},
+      "is": {b:"The soup ___ hot",a:"."},
+      "are": {b:"We ___ on time",a:"."},
+      "was": {b:"It ___ raining yesterday",a:"."},
+      "were": {b:"We ___ at the park",a:"."}
+    };
+    const t = map[wl];
+    if (t) return {answer: wl, textBefore:t.b, textAfter:t.a};
+  }
+
+  // MODALS
+  if (POS_BUCKETS.modals.has(wl)){
+    return {answer: wl, textBefore:`I ___ try again`, textAfter:"."};
+  }
+
+  // CONJUNCTIONS
+  if (POS_BUCKETS.conj.has(wl)){
+    const map = {
+      "and": {b:"I like apples ___ bananas",a:"."},
+      "but": {b:"I want to play ___ it’s late",a:"."},
+      "or": {b:"Do you want milk ___ water",a:"?"},
+      "so": {b:"It’s raining, ___ we’ll stay inside",a:"."},
+      "because": {b:"I smiled ___ it’s your birthday",a:"."},
+      "if": {b:"___ you’re ready, we can go",a:"."},
+      "when": {b:"I clap ___ the song ends",a:"."},
+      "while": {b:"Read quietly ___ we wait",a:"."},
+      "though": {b:"I tried, ___ it was hard",a:"."},
+      "after": {b:"Brush teeth ___ dinner",a:"."},
+      "before": {b:"Pack your bag ___ school",a:"."},
+      "until": {b:"Wait here ___ the light turns green",a:"."}
+    };
+    const t = map[wl] || {b:"I read ___ I rest",a:"."};
+    return {answer: wl, textBefore:t.b, textAfter:t.a};
+  }
+
+  // Common verbs/nouns/adjectives fallback (safe & natural)
+  // We keep it simple and age-appropriate:
+  const genericPatterns = [
+    {b:"I saw ___ on the page", a:"."},
+    {b:"We say ___ together", a:"."},
+    {b:"Write the word ___", a:"."},
+    {b:"Can you read ___ out loud", a:"?"},
+    {b:"Point to ___ in your book", a:"."},
+    {b:"Spell ___ using the letter tiles", a:"."},
+    {b:"Use ___ in a sentence", a:"."}
+  ];
+  const pick = genericPatterns[Math.floor(Math.random()*genericPatterns.length)];
+  return {answer: wl, textBefore: pick.b, textAfter: pick.a};
+}
+
+/* Build a large deck: curated + 220 auto-generated unique words */
+}
+  return autos;
+}
+
+
 
 /* ---------------- State & Storage ------------------ */
 const LS_STATE = 'l2r_state_v2';
