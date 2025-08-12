@@ -46,8 +46,8 @@
       if('serviceWorker' in navigator){
         const swCode = `
           const CACHE = 'caleb-cloze-cache-v2';
-          const OFFLINE_URL = '/offline.html';
-          const CORE = [ self.location.href, OFFLINE_URL, '/icons/icon-192.png', '/icons/icon-512.png' ];
+          const OFFLINE_URL = 'offline.html';
+          const CORE = [ self.location.href, OFFLINE_URL, 'icons/icon-192.png', 'icons/icon-512.png' ];
 
           const OFFLINE_HTML = ` + "`" + `<!doctype html>
           <html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Learn2Read</title>
