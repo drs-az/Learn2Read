@@ -428,132 +428,184 @@ const CURATED = [
   {answer:"white", textBefore:"Snow looks so ___", textAfter:"."}
 ];
 
-/* Auto-generate 200+ cloze sentences tailored by rough part-of-speech buckets.
-   We cover function words with specific patterns; the rest use safe neutral templates. */
-const POS_BUCKETS = {
-  articles: new Set(["the","a","an"]),
-  preps: new Set(["to","in","on","at","by","with","from","into","over","under","between","through","after","before","around","above","below","near","off","up","out","across","during"]),
-  pronouns: new Set(["I","you","he","she","it","we","they","me","him","her","us","them","my","your","his","her","its","our","their"]),
-  beAux: new Set(["am","is","are","was","were"]),
-  modals: new Set(["can","will","would","could","should","may","might","must","shall"]),
-  conj: new Set(["and","but","or","so","because","if","when","while","though","after","before","until"]),
-  det: new Set(["this","that","these","those","some","any","each","every","no"]),
+/* ========= Natural Language Cloze Generator (POS-aware) ========= */
+
+/* 1) Categorize common FUNCTION WORDS (covers most awkward cases) */
+const CAT = {
+  ARTICLE: 'article',
+  DEMONSTRATIVE: 'demonstrative',
+  DETERMINER: 'determiner',
+  PRONOUN_SUBJ: 'pronounSubj',
+  PRONOUN_OBJ: 'pronounObj',
+  POSSESSIVE: 'possessive',
+  PREPOSITION: 'preposition',
+  BE_LINK: 'beLink',
+  DO_AUX: 'doAux',
+  MODAL: 'modal',
+  CONJ: 'conjunction',
+  WH: 'wh',
+  ADVERB: 'adverb',
+  NEGATION: 'negation',
+  NUMBER: 'number',
+  META: 'meta',         // generic "read/write/say the word ___" style
 };
 
-function buildSentenceFor(word){
-  const w = word;
-  const wl = w.toLowerCase();
+const SETS = {
+  article: new Set(['the','a','an']),
+  demonstrative: new Set(['this','that','these','those']),
+  determiner: new Set(['some','any','each','every','no','both','another','other','many','few','several','more','most','such','own','same','another']),
+  pronounSubj: new Set(['i','you','he','she','it','we','they']),
+  pronounObj: new Set(['me','him','her','us','them']),
+  possessive: new Set(['my','your','his','her','its','our','their']),
+  preposition: new Set(['in','on','at','by','with','from','into','over','under','between','through','after','before','around','above','below','near','off','up','out','across','during','toward','to']),
+  beLink: new Set(['am','is','are','was','were']),
+  doAux: new Set(['do','does','did']),
+  modal: new Set(['can','will','would','could','should','may','might','must','shall']),
+  conjunction: new Set(['and','but','or','so','because','if','when','while','though','until','after','before']),
+  wh: new Set(['what','when','where','why','how','which','who','whom','whose']),
+  adverb: new Set(['very','too','also','just','now','then','so','not','only','even','still','again','always','often','never']),
+  negation: new Set(['no',"don't","didn’t","didn't","can’t","cant","cannot","won’t","wouldn’t","shouldn’t"]),
+  number: new Set(['one','two','three','four','five','six','seven','eight','nine','ten','hundred','thousand'])
+};
 
-  // ARTICLES
-  if (POS_BUCKETS.articles.has(wl)){
-    return {answer: wl, textBefore:"___ puppy is sleeping", textAfter:"."};
-  }
-  // PREPOSITIONS
-  if (POS_BUCKETS.preps.has(wl)){
-    const map = {
-      "to": {b:"We walked ___ the park",a:"."},
-      "in": {b:"Put the crayons ___ the box",a:"."},
-      "on": {b:"Keep your hands ___ the rail",a:"."},
-      "at": {b:"Meet me ___ the library",a:"."},
-      "by": {b:"Stand ___ the door",a:"."},
-      "with": {b:"I like pancakes ___ syrup",a:"."},
-      "from": {b:"This note is ___ Mom",a:"."},
-      "into": {b:"Step ___ the circle",a:"."},
-      "over": {b:"Jump ___ the puddle",a:"!"},
-      "under": {b:"The cat hides ___ the table",a:"."},
-      "between": {b:"The ball rolled ___ the chairs",a:"."},
-      "through": {b:"Walk ___ the tunnel",a:"."},
-      "after": {b:"We will play ___ lunch",a:"."},
-      "before": {b:"Wash hands ___ dinner",a:"."},
-      "around": {b:"Run ___ the cones",a:"."},
-      "above": {b:"The kite flew ___ the trees",a:"."},
-      "below": {b:"The fish swim ___ the dock",a:"."},
-      "near": {b:"Sit ___ your friends",a:"."},
-      "off": {b:"Please turn ___ the light",a:"."},
-      "up": {b:"Climb ___ the ladder",a:"."},
-      "out": {b:"Take the trash ___",a:"."},
-      "across": {b:"Look both ways ___ the street",a:"."},
-      "during": {b:"Stay quiet ___ the show",a:"."}
-    };
-    const t = map[wl] || {b:"We go ___ the park",a:"."};
-    return {answer: wl, textBefore:t.b.replace("___", "___"), textAfter:t.a};
-  }
-  // PRONOUNS / DETERMINERS
-  if (POS_BUCKETS.pronouns.has(w)) return {answer: wl, textBefore:"___ will share the blocks", textAfter:"."};
-  if (POS_BUCKETS.det.has(wl)) return {answer: wl, textBefore:"___ cookie fell on the plate", textAfter:"."};
+/* 2) Kid-friendly TEMPLATES for each category.
+      Each string contains "___" where the missing word goes. */
+const TEMPLATES = {
+  [CAT.ARTICLE]: [
+    "___ dog ran fast.",
+    "I saw ___ bird in the tree.",
+    "Please hand me ___ book."
+  ],
+  [CAT.DEMONSTRATIVE]: [
+    "___ cookie is for you.",
+    "Put ___ toys in the bin.",
+    "I like ___ game a lot."
+  ],
+  [CAT.DETERMINER]: [
+    "I have ___ stickers to share.",
+    "Are there ___ crayons left?",
+    "We need ___ help today."
+  ],
+  [CAT.PRONOUN_SUBJ]: [
+    "___ like to play outside.",
+    "___ is my best friend.",
+    "Can ___ come with us?"
+  ],
+  [CAT.PRONOUN_OBJ]: [
+    "Mom helped ___ tie my shoes.",
+    "I saw ___ at the park.",
+    "Please give the ball to ___."
+  ],
+  [CAT.POSSESSIVE]: [
+    "That is ___ backpack.",
+    "___ teacher is very kind.",
+    "I forgot ___ homework."
+  ],
+  [CAT.PREPOSITION]: [
+    "The ball is ___ the box.",
+    "We hide ___ the table.",
+    "The cat sleeps ___ my bed."
+  ],
+  [CAT.BE_LINK]: [
+    "The soup ___ hot.",
+    "We ___ ready to go.",
+    "My name ___ Sam."
+  ],
+  [CAT.DO_AUX]: [
+    "___ you want to read?",
+    "___ he like apples?",
+    "We ___ our chores."
+  ],
+  [CAT.MODAL]: [
+    "I ___ ride my bike.",
+    "She ___ help you.",
+    "We ___ play after lunch."
+  ],
+  [CAT.CONJ]: [
+    "I like cats ___ dogs.",
+    "It is sunny ___ warm.",
+    "We stayed inside ___ it rained."
+  ],
+  [CAT.WH]: [
+    "___ is your favorite book?",
+    "___ do we go to class?",
+    "___ should we try next?"
+  ],
+  [CAT.ADVERB]: [
+    "You read ___ well.",
+    "He ran ___ fast.",
+    "She is ___ happy today."
+  ],
+  [CAT.NEGATION]: [
+    "___ running in the hall!",
+    "I ___ know the answer.",
+    "We ___ have time."
+  ],
+  [CAT.NUMBER]: [
+    "We have ___ apples.",
+    "Write the number ___.",
+    "Count to ___ together."
+  ],
+  [CAT.META]: [
+    "Can you read ___ out loud?",
+    "Please write the word ___.",
+    "Point to ___ in your book.",
+    "Use ___ in a sentence.",
+    "Spell ___ with letter tiles."
+  ]
+};
 
-  // BE verbs
-  if (POS_BUCKETS.beAux.has(wl)){
-    const map = {
-      "am": {b:"I ___ ready to read",a:"!"},
-      "is": {b:"The soup ___ hot",a:"."},
-      "are": {b:"We ___ on time",a:"."},
-      "was": {b:"It ___ raining yesterday",a:"."},
-      "were": {b:"We ___ at the park",a:"."}
-    };
-    const t = map[wl];
-    if (t) return {answer: wl, textBefore:t.b, textAfter:t.a};
-  }
-
-  // MODALS
-  if (POS_BUCKETS.modals.has(wl)){
-    return {answer: wl, textBefore:`I ___ try again`, textAfter:"."};
-  }
-
-  // CONJUNCTIONS
-  if (POS_BUCKETS.conj.has(wl)){
-    const map = {
-      "and": {b:"I like apples ___ bananas",a:"."},
-      "but": {b:"I want to play ___ it’s late",a:"."},
-      "or": {b:"Do you want milk ___ water",a:"?"},
-      "so": {b:"It’s raining, ___ we’ll stay inside",a:"."},
-      "because": {b:"I smiled ___ it’s your birthday",a:"."},
-      "if": {b:"___ you’re ready, we can go",a:"."},
-      "when": {b:"I clap ___ the song ends",a:"."},
-      "while": {b:"Read quietly ___ we wait",a:"."},
-      "though": {b:"I tried, ___ it was hard",a:"."},
-      "after": {b:"Brush teeth ___ dinner",a:"."},
-      "before": {b:"Pack your bag ___ school",a:"."},
-      "until": {b:"Wait here ___ the light turns green",a:"."}
-    };
-    const t = map[wl] || {b:"I read ___ I rest",a:"."};
-    return {answer: wl, textBefore:t.b, textAfter:t.a};
-  }
-
-  // Common verbs/nouns/adjectives fallback (safe & natural)
-  // We keep it simple and age-appropriate:
-  const genericPatterns = [
-    {b:"I saw ___ on the page", a:"."},
-    {b:"We say ___ together", a:"."},
-    {b:"Write the word ___", a:"."},
-    {b:"Can you read ___ out loud", a:"?"},
-    {b:"Point to ___ in your book", a:"."},
-    {b:"Spell ___ using the letter tiles", a:"."},
-    {b:"Use ___ in a sentence", a:"."}
-  ];
-  const pick = genericPatterns[Math.floor(Math.random()*genericPatterns.length)];
-  return {answer: wl, textBefore: pick.b, textAfter: pick.a};
+/* 3) Categorizer: maps a word to its best-fit category for early reading */
+function categorizeWord(raw) {
+  const w = raw.toLowerCase();
+  if (SETS.article.has(w)) return CAT.ARTICLE;
+  if (SETS.demonstrative.has(w)) return CAT.DEMONSTRATIVE;
+  if (SETS.determiner.has(w)) return CAT.DETERMINER;
+  if (SETS.pronounSubj.has(w)) return CAT.PRONOUN_SUBJ;
+  if (SETS.pronounObj.has(w)) return CAT.PRONOUN_OBJ;
+  if (SETS.possessive.has(w)) return CAT.POSSESSIVE;
+  if (SETS.preposition.has(w)) return CAT.PREPOSITION;
+  if (SETS.beLink.has(w)) return CAT.BE_LINK;
+  if (SETS.doAux.has(w)) return CAT.DO_AUX;
+  if (SETS.modal.has(w)) return CAT.MODAL;
+  if (SETS.conjunction.has(w)) return CAT.CONJ;
+  if (SETS.wh.has(w)) return CAT.WH;
+  if (SETS.adverb.has(w)) return CAT.ADVERB;
+  if (SETS.negation.has(w)) return CAT.NEGATION;
+  if (SETS.number.has(w)) return CAT.NUMBER;
+  return CAT.META; // safe default that always sounds natural
 }
 
-/* Build a large deck: curated + 220 auto-generated unique words */
-function buildAutoDeck(){
-  const used = new Set(CURATED.map(s=>s.answer.toLowerCase()));
+/* 4) Build a single logical sentence for a given word */
+function buildSentenceFor(word) {
+  const cat = categorizeWord(word);
+  const list = TEMPLATES[cat] || TEMPLATES[CAT.META];
+  const template = list[Math.floor(Math.random() * list.length)];
+  const [before, after=''] = template.split('___');
+  return { answer: word.toLowerCase(), textBefore: before.trim(), textAfter: after.trim() };
+}
+
+/* 5) Build a large deck: curated + N auto-generated (all logical) */
+function buildAutoDeck(n = 300) {
+  const used = new Set(CURATED.map(s => s.answer.toLowerCase()));
   const autos = [];
-  for (let i=0;i<FRY_WORDS.length && autos.length<220;i++){
-    const w = FRY_WORDS[i];
+  const pool = [...FRY_WORDS].sort(() => Math.random() - 0.5); // shuffle
+
+  for (const w of pool) {
     const wl = w.toLowerCase();
     if (used.has(wl)) continue;
-    const s = buildSentenceFor(w);
-    // Ensure reasonable sentence and not too short:
-    if (s && s.answer && s.textBefore && (s.textBefore.length + (s.textAfter||'').length) >= 10){
+    const s = buildSentenceFor(wl);
+    if (s && s.textBefore && (s.textBefore.length + (s.textAfter||'').length) >= 8) {
       autos.push(s);
       used.add(wl);
     }
+    if (autos.length >= n) break;
   }
   return autos;
 }
 
-const SENTENCES = [...CURATED, ...buildAutoDeck()];
+/* 6) Rebuild the SENTENCES deck using curated + logical autos */
+const SENTENCES = [...CURATED, ...buildAutoDeck(300)];
 
 /* ---------------- State & Storage ------------------ */
 const LS_STATE = 'l2r_state_v2';
