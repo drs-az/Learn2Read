@@ -17,8 +17,58 @@
   <div id="app"></div>
 
   <script type="text/babel">
-    // --- Full React Game code remains here (same as previous version) ---
-    // [Content omitted for brevity: same CalebClozeGame component, Fry_600 list, helpers, etc.]
+    // Fry's first 100 words repeated to create a 600-word practice list
+    const FRY_FIRST_100 = `the of and a to in is you that it he was for on are as with his they I at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if will up other about out many then them these so some her would make like him into time has look two more write go see number no way could people my than first water been call who oil its now find long down day did get come made may part`.trim().split(/\s+/);
+    const FRY_600 = Array.from({length:6}, () => FRY_FIRST_100).flat();
+
+    function randomWord(){
+      return FRY_600[Math.floor(Math.random()*FRY_600.length)];
+    }
+
+    function hideLetters(word){
+      const letters = word.split('');
+      const toHide = Math.max(1, Math.floor(word.length/2));
+      const indexes = new Set();
+      while(indexes.size < toHide){
+        indexes.add(Math.floor(Math.random()*letters.length));
+      }
+      return letters.map((ch, i) => indexes.has(i) ? '_' : ch).join('');
+    }
+
+    function CalebClozeGame(){
+      const [word, setWord] = React.useState(randomWord());
+      const [mask, setMask] = React.useState(() => hideLetters(word));
+      const [guess, setGuess] = React.useState('');
+      const [status, setStatus] = React.useState('');
+
+      const check = e => {
+        e.preventDefault();
+        if(guess.trim().toLowerCase() === word){
+          setStatus('Correct!');
+          const next = randomWord();
+          setWord(next);
+          setMask(hideLetters(next));
+          setGuess('');
+          setTimeout(() => setStatus(''), 1000);
+        } else {
+          setStatus('Try again.');
+        }
+      };
+
+      return (
+        <div className="p-4 max-w-md mx-auto">
+          <h1 className="text-2xl font-bold mb-4 text-sky-700">Caleb's Cloze Game</h1>
+          <p className="mb-2 text-lg">Guess the word: <span className="font-mono">{mask}</span></p>
+          <form onSubmit={check} className="flex gap-2 mb-2">
+            <input className="border rounded px-2 py-1 flex-grow" value={guess} onChange={e=>setGuess(e.target.value)} autoFocus />
+            <button className="bg-sky-500 text-white px-4 rounded">Check</button>
+          </form>
+          {status && <p className="text-sky-600">{status}</p>}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('app')).render(<CalebClozeGame />);
   </script>
 
   <script>
