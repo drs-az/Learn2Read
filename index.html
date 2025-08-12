@@ -129,12 +129,12 @@ main {
   gap: 6px;
   vertical-align: middle;
   margin: 0 6px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap; max-width: 100%;
 }
 
 .tile {
-  width: 46px;
-  height: 58px;
+  width: clamp(34px, 9vw, 46px);
+  height: clamp(46px, 12vw, 58px);
   border-radius: 14px;
   border: 2px solid #e5e7eb;
   background: #f9fafb;
@@ -447,6 +447,9 @@ const CAT = {
   ADVERB: 'adverb',
   NEGATION: 'negation',
   NUMBER: 'number',
+  NOUN: 'noun',
+  VERB: 'verb',
+  ADJ: 'adjective',
   META: 'meta',         // generic "read/write/say the word ___" style
 };
 
@@ -467,11 +470,49 @@ const SETS = {
   negation: new Set(['no',"don't","didn’t","didn't","can’t","cant","cannot","won’t","wouldn’t","shouldn’t"]),
   number: new Set(['one','two','three','four','five','six','seven','eight','nine','ten','hundred','thousand'])
 };
+/* Specialized content-word lists (subset of Fry words) */
+const FRY_NOUNS = new Set([
+  'river','water','school','father','mother','city','earth','tree','story','paper','car',
+  'night','day','hand','home','boy','girl','door','table','room','book','dog','horse',
+  'birds','music','color','sun','fish','area','mark','problem','family','body','friend',
+  'children','group','world','america','country','plant','page','letter','point'
+]);
+const FRY_VERBS = new Set([
+  'run','walk','play','read','write','make','see','look','come','go','get','find','start',
+  'keep','learn','spell','help','show','tell','try','move','ask','follow','carry','grow',
+  'took','took','took','bring','gave','wait','open','close','change'
+]);
+const FRY_ADJECTIVES = new Set([
+  'big','small','little','new','old','good','great','high','long','short','white','black',
+  'red','best','better','early','fast','low','real','young','happy'
+]);
+
 
 /* 2) Kid-friendly TEMPLATES for each category.
       Each string contains "___" where the missing word goes. */
 const TEMPLATES = {
-  [CAT.ARTICLE]: [
+  [CAT.NOUN]: [
+    'The ___ is big.',
+    'I saw the ___ today.',
+    'We crossed the ___.',
+    'The ___ is on the map.',
+    'Please draw the ___.'
+  ],
+  [CAT.VERB]: [
+    'I like to ___ fast.',
+    'We will ___ to the park.',
+    'Can you ___ with me?',
+    'Please ___ your name.',
+    'Do not ___ in the hall.'
+  ],
+  [CAT.ADJ]: [
+    'The house is ___.',
+    'This is a ___ book.',
+    'We had a ___ day.',
+    'That is a ___ idea.',
+    'The road is ___ and safe.'
+  ],
+[CAT.ARTICLE]: [
     "___ dog ran fast.",
     "I saw ___ bird in the tree.",
     "Please hand me ___ book."
@@ -558,7 +599,10 @@ const TEMPLATES = {
 /* 3) Categorizer: maps a word to its best-fit category for early reading */
 function categorizeWord(raw) {
   const w = raw.toLowerCase();
-  if (SETS.article.has(w)) return CAT.ARTICLE;
+    if (FRY_NOUNS.has(w)) return CAT.NOUN;
+  if (FRY_VERBS.has(w)) return CAT.VERB;
+  if (FRY_ADJECTIVES.has(w)) return CAT.ADJ;
+if (SETS.article.has(w)) return CAT.ARTICLE;
   if (SETS.demonstrative.has(w)) return CAT.DEMONSTRATIVE;
   if (SETS.determiner.has(w)) return CAT.DETERMINER;
   if (SETS.pronounSubj.has(w)) return CAT.PRONOUN_SUBJ;
