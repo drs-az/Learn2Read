@@ -83,48 +83,127 @@ header {
       padding:0;text-decoration:underline;
     }
 
-    main{
-      flex:1;
-      display:grid;place-items:center;
-      padding:16px;
-      padding-bottom: calc(16px + var(--safe-bottom));
-      max-width: 100vw;
-      overflow: auto;           /* allow content scroll within viewport */
-    }
-    .card{
-      width:min(900px, 96vw);
-      background:var(--card); border-radius:24px; padding:20px;
-      box-shadow:0 20px 60px rgba(0,0,0,.12);
-      position:relative; overflow:hidden;
-    }
-    .subtitle{color:var(--muted);margin:4px 0 12px;font-size:14px}
-    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-    .sentence{
-      font-size:26px;line-height:1.4;margin:12px 0 6px;word-wrap:break-word;
-    }
-    .blank{
-      display:inline-flex;gap:6px;vertical-align:middle;margin:0 6px;flex-wrap:nowrap
-    }
-    .tile{
-      width:46px;height:58px;border-radius:14px;border:2px solid #e5e7eb;background:#f9fafb;
-      font-size:28px;text-transform:lowercase;text-align:center;font-weight:800;color:#111;
-      caret-color:transparent;outline:none;
-      box-shadow:inset 0 -4px 0 #e5e7eb;
-    }
-    @media (max-width:420px){
-      .tile{width:38px;height:52px;font-size:24px}
-      .sentence{font-size:22px}
-    }
-    .tile:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,99,255,.25), inset 0 -4px 0 #e5e7eb}
-    .actions{margin-top:16px;display:flex;gap:12px;flex-wrap:wrap}
-    .msg{margin-top:12px;font-weight:700}
-    .msg.good{color:var(--good)}
-    .msg.bad{color:var(--bad)}
-    .progress{margin-top:8px;color:var(--muted);font-size:14px}
-    .chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-    .chip{
-      font-size:12px;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3
-    }
+main {
+  flex: 1;
+  display: flex;                         /* flexbox for horizontal centering */
+  justify-content: center;               /* center horizontally */
+  align-items: flex-start;                /* align to top */
+  padding: 32px 16px 16px;                /* extra top padding for aesthetics */
+  padding-bottom: calc(16px + var(--safe-bottom));
+  max-width: 100vw;
+  overflow: auto;                         /* allow scroll if needed */
+}
+
+.card {
+  width: min(900px, 96vw);
+  background: var(--card);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin: 4px 0 12px;
+  font-size: 14px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.sentence {
+  font-size: 26px;
+  line-height: 1.4;
+  margin: 12px 0 6px;
+  word-wrap: break-word;
+}
+
+.blank {
+  display: inline-flex;
+  gap: 6px;
+  vertical-align: middle;
+  margin: 0 6px;
+  flex-wrap: nowrap;
+}
+
+.tile {
+  width: 46px;
+  height: 58px;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 28px;
+  text-transform: lowercase;
+  text-align: center;
+  font-weight: 800;
+  color: #111;
+  caret-color: transparent;
+  outline: none;
+  box-shadow: inset 0 -4px 0 #e5e7eb;
+}
+
+@media (max-width: 420px) {
+  .tile {
+    width: 38px;
+    height: 52px;
+    font-size: 24px;
+  }
+  .sentence {
+    font-size: 22px;
+  }
+}
+
+.tile:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108,99,255,.25), inset 0 -4px 0 #e5e7eb;
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.msg {
+  margin-top: 12px;
+  font-weight: 700;
+}
+
+.msg.good {
+  color: var(--good);
+}
+
+.msg.bad {
+  color: var(--bad);
+}
+
+.progress {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+}
     footer{padding:12px;text-align:center;color:var(--muted);font-size:12px}
 
     .confetti{position:absolute;inset:0;pointer-events:none}
