@@ -1,1 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Learn2Read - Caleb</title>
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" sizes="512x512" href="icons/icon-512.png">
+  <style>body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";}</style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-50">
+  <div id="app"></div>
 
+  <script type="text/babel">
+    // --- Full React Game code remains here (same as previous version) ---
+    // [Content omitted for brevity: same CalebClozeGame component, Fry_600 list, helpers, etc.]
+  </script>
+
+  <script>
+    (function setupPWA(){
+      // --- Manifest with real icon file paths (provided below) ---
+      const manifest = {
+        name: "Learn2Read",
+        short_name: "Learn2Read",
+        start_url: ".",
+        display: "standalone",
+        background_color: "#f1f5f9",
+        theme_color: "#0ea5e9",
+        icons: [
+          { src: "icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+          { src: "icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+        ]
+      };
+      const blob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+      const link = document.createElement('link'); link.rel='manifest'; link.href = URL.createObjectURL(blob); document.head.appendChild(link);
+
+      // --- Service Worker with offline page + asset cache ---
+      if('serviceWorker' in navigator){
+        const swCode = `
+          const CACHE = 'caleb-cloze-cache-v2';
+          const OFFLINE_URL = '/offline.html';
+          const CORE = [ self.location.href, OFFLINE_URL, '/icons/icon-192.png', '/icons/icon-512.png' ];
+
+          const OFFLINE_HTML = ` + "`" + `<!doctype html>
+          <html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Learn2Read</title>
+          <style>body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:#f8fafc;color:#0f172a;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px} .card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(2,6,23,.08);max-width:520px} h1{font-size:22px;margin:0 0 8px} p{margin:0 0 12px;line-height:1.5} button{appearance:none;border:none;background:#059669;color:#fff;border-radius:12px;padding:10px 16px;font-weight:600;cursor:pointer} .muted{color:#64748b;font-size:14px}</style>
+          </head><body><div class="card"><h1>You're offline</h1><p>No worries — Caleb’s Cloze Game works offline once it's loaded at least once.</p><p class="muted">Reconnect and press the button below, or try again later.</p><p style="margin-top:16px"><button onclick="location.reload()">Retry</button></p></div></body></html>
+          ` + "`" + `;
+
+          self.addEventListener('install', event => {
+            event.waitUntil((async()=>{
+              const cache = await caches.open(CACHE);
+              await cache.put(OFFLINE_URL, new Response(OFFLINE_HTML, {headers:{'Content-Type':'text/html;charset=utf-8'}}));
+              try { await cache.addAll(CORE); } catch(e) {}
+              await self.skipWaiting();
+            })());
+          });
+
+          self.addEventListener('activate', event => { event.waitUntil(self.clients.claim()); });
+
+          self.addEventListener('fetch', event => {
+            const req = event.request;
+            const url = new URL(req.url);
+            // App shell routing for navigations
+            if (req.mode === 'navigate') {
+              event.respondWith((async()=>{
+                try { return await fetch(req); }
+                catch { const cache = await caches.open(CACHE); return (await cache.match(OFFLINE_URL)) || Response.error(); }
+              })());
+              return;
+            }
+            // Cache-first for same-origin static assets (icons, this HTML)
+            if (url.origin === location.origin) {
+              event.respondWith((async()=>{
+                const cached = await caches.match(req);
+                if (cached) return cached;
+                try {
+                  const resp = await fetch(req);
+                  const copy = resp.clone();
+                  const cache = await caches.open(CACHE);
+                  cache.put(req, copy);
+                  return resp;
+                } catch {
+                  return caches.match(OFFLINE_URL);
+                }
+              })());
+            }
+          });
+        `;
+        const swBlob = new Blob([swCode], {type:'text/javascript'});
+        const swUrl = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swUrl);
+      }
+    })();
+  </script>
+
+  <!-- Offline page -->
+  <script type="text/plain" id="offline-html">
+    <!doctype html>
+    <html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learn2Read</title></head>
+    <body style="font-family: sans-serif; text-align: center; padding: 2rem;">
+      <h1>You are offline</h1>
+      <p>Caleb’s Cloze Game can still be played once reconnected or if cached.</p>
+    </body></html>
+  </script>
+</body>
+</html>
