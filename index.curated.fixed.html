@@ -1,0 +1,1059 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Learn2Read – Fry Words Game</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#6C63FF" />
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --primary:#6C63FF;
+      --accent:#FFB703;
+      --good:#06a77d;
+      --bad:#e63946;
+      --text:#222;
+      --muted:#6b7280;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    *{box-sizing:border-box}
+
+    html, body {
+      height: 100%;
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
+    }
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      background:
+        radial-gradient(70% 50% at 10% 0%, #efeaff 0%, transparent 70%),
+        radial-gradient(60% 40% at 90% 10%, #ffe9c7 0%, transparent 60%),
+        var(--bg);
+      color:var(--text);
+      display:flex;
+      flex-direction:column;
+      min-height:100svh;
+      max-width: 100vw;         /* contain horizontally */
+      overflow-x: hidden;       /* prevent side scroll */
+    }
+
+header {
+  background: linear-gradient(90deg,var(--primary),#7a74ff);
+  color: #fff;
+  padding: calc(8px + var(--safe-top)) 16px 8px 16px;
+  display: flex;
+  flex-direction: column;       /* stack children vertically */
+  gap: 8px;                     /* space between brand and nav */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: #fff;
+  flex-wrap: wrap;
+  justify-content: flex-start;  /* align to left under brand */
+}
+    .pill{
+      background:rgba(255,255,255,.18);
+      padding:6px 10px;border-radius:999px;font-size:13px;white-space:nowrap
+    }
+    .btn{
+      border:0;border-radius:12px;padding:10px 16px;font-weight:700;
+      background:#fff;color:var(--primary);cursor:pointer;
+      box-shadow:0 8px 16px rgba(0,0,0,.08);
+      transition:transform .06s ease, box-shadow .2s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.secondary{background:transparent;color:#fff;border:2px solid #fff}
+    .link-btn{
+      background:transparent;border:none;color:var(--primary);font-weight:800;cursor:pointer;
+      padding:0;text-decoration:underline;
+    }
+
+main {
+  flex: 1;
+  display: flex;                         /* flexbox for horizontal centering */
+  justify-content: center;               /* center horizontally */
+  align-items: flex-start;                /* align to top */
+  padding: 32px 16px 16px;                /* extra top padding for aesthetics */
+  padding-bottom: calc(16px + var(--safe-bottom));
+  max-width: 100vw;
+  overflow: auto;                         /* allow scroll if needed */
+}
+
+.card {
+  width: min(900px, 96vw);
+  background: var(--card);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin: 4px 0 12px;
+  font-size: 14px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.sentence {
+  font-size: 26px;
+  line-height: 1.4;
+  margin: 12px 0 6px;
+  word-wrap: break-word;
+}
+
+.blank {
+  display: inline-flex;
+  gap: 6px;
+  vertical-align: middle;
+  margin: 0 6px;
+  flex-wrap: nowrap;
+}
+
+.tile {
+  width: 46px;
+  height: 58px;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 28px;
+  text-transform: lowercase;
+  text-align: center;
+  font-weight: 800;
+  color: #111;
+  caret-color: transparent;
+  outline: none;
+  box-shadow: inset 0 -4px 0 #e5e7eb;
+}
+
+@media (max-width: 420px) {
+  .tile {
+    width: 38px;
+    height: 52px;
+    font-size: 24px;
+  }
+  .sentence {
+    font-size: 22px;
+  }
+}
+
+.tile:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108,99,255,.25), inset 0 -4px 0 #e5e7eb;
+}
+
+.actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.msg {
+  margin-top: 12px;
+  font-weight: 700;
+}
+
+.msg.good {
+  color: var(--good);
+}
+
+.msg.bad {
+  color: var(--bad);
+}
+
+.progress {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+}
+    footer{padding:12px;text-align:center;color:var(--muted);font-size:12px}
+
+    .confetti{position:absolute;inset:0;pointer-events:none}
+
+    /* Dashboard modal */
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,.45);
+      display:none;align-items:center;justify-content:center;z-index:50;padding:16px;
+    }
+    .modal{
+      width:min(900px,96vw);max-height:90svh;overflow:auto;
+      background:#fff;border-radius:20px;padding:20px;
+      box-shadow:0 24px 64px rgba(0,0,0,.3)
+    }
+    .modal h2{margin:0 0 6px 0}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{padding:8px 10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
+    .badge{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:999px;padding:4px 8px;font-size:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="icons/icon-192.png" alt="" width="32" height="32" style="border-radius:8px;box-shadow:0 3px 8px rgba(0,0,0,.25)">
+      <h1>Learn2Read</h1>
+      <span class="pill">Fry Instant Words</span>
+    </div>
+    <div class="nav">
+      <button id="newGameBtn" class="btn secondary">New Game</button>
+      <button id="resetBtn" class="btn secondary" title="Clears progress & score">Reset Game</button>
+      <button id="dashboardBtn" class="btn secondary" title="Parent dashboard">Dashboard</button>
+      <span class="pill">✅ Correct: <b id="scoreCorrect">0</b></span>
+      <span class="pill">❌ Incorrect: <b id="scoreIncorrect">0</b></span>
+    </div>
+  </header>
+
+  <main>
+    <div class="card" id="card">
+      <canvas class="confetti" id="confetti"></canvas>
+
+      <div class="subtitle">Fill in the missing word using letter boxes, then tap <b>Grade</b>.</div>
+      <div id="sentence" class="sentence">Press <b>New Game</b> to start.</div>
+
+      <div class="actions">
+        <button id="gradeBtn" class="btn">Grade</button>
+        <button id="nextBtn" class="btn" style="display:none">Next Sentence</button>
+        <button id="revealBtn" class="btn" style="display:none">Show Hint</button>
+      </div>
+
+      <div class="progress" id="progress"></div>
+
+      <!-- Reveal toggle: hidden answer chips -->
+      <div style="margin-top:6px">
+        <button id="revealToggle" class="link-btn" style="display:none">Reveal</button>
+      </div>
+      <div class="chips" id="chips" style="display:none"></div>
+
+      <div id="message" class="msg"></div>
+    </div>
+  </main>
+
+  <footer>Words: Fry Instant Words (goal: 600). Source: UEN & Dr. Edward Fry resources.</footer>
+
+  <!-- Dashboard Modal -->
+  <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dashTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <h2 id="dashTitle">Parent Dashboard</h2>
+        <button id="closeModal" class="btn">Close</button>
+      </div>
+      <p class="subtitle" id="timeOnTask">Time on task: —</p>
+      <h3>Per-Word Accuracy</h3>
+      <table class="table" id="accuracyTable">
+        <thead>
+          <tr><th>Word</th><th>First-Try Correct %</th><th>Attempts</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <h3 style="margin-top:14px">Words to Review</h3>
+      <div id="reviewList" class="chips"></div>
+    </div>
+  </div>
+
+<script>
+/* --- PWA bootstrap --- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(console.error);
+  });
+}
+
+/* --- Data: Fry Instant Words -------------------------------------------------
+   Sources (for your reference):
+   - UEN Fry Instant Words (ranked 1–600) – https://www.uen.org/k-2educator/word_lists.shtml
+   - Dr. Edward Fry Instant Word List PDF (1–600) – by Tim Rasinski
+----------------------------------------------------------------------------- */
+const FRY_WORDS = [
+  // First 100
+  "the","of","and","a","to","in","is","you","that","it","he","was","for","on","are","as","with","his","they","I",
+  "at","be","this","have","from","or","one","had","by","word","but","not","what","all","were","we","when","your","can","said",
+  "there","use","an","each","which","she","do","how","their","if","will","up","other","about","out","many","then","them","these","so",
+  "some","her","would","make","like","him","into","time","has","look","two","more","write","go","see","number","no","way","could","people",
+  "my","than","first","water","been","call","who","oil","its","now","find","long","down","day","did","get","come","made","may","part",
+  // Second 100
+  "over","new","sound","take","only","little","work","know","place","year","live","me","back","give","most","very","after","thing","our","just",
+  "name","good","sentence","man","think","say","great","where","help","through","much","before","line","right","too","means","old","any","same","tell",
+  "boy","follow","came","want","show","also","around","form","three","small","set","put","end","does","another","well","large","must","big","even",
+  "such","because","turn","here","why","ask","went","men","read","need","land","different","home","us","move","try","kind","hand","picture","again",
+  // Third 100
+  "change","off","play","spell","air","away","animal","house","point","page","letter","mother","answer","found","study","still","learn","should","America","world",
+  "high","every","near","add","food","between","own","below","country","plant","last","school","father","keep","tree","never","start","city","earth","eye",
+  "light","thought","head","under","story","saw","left","don’t","few","while","along","might","close","something","seem","next","hard","open","example","begin",
+  "life","always","those","both","paper","together","got","group","often","run","important","until","children","side","feet","car","mile","night","walk","white",
+  // Fourth 100
+  "sea","began","grow","took","river","four","carry","state","once","book","hear","stop","without","second","late","miss","idea","enough","eat","face",
+  "watch","far","Indian","real","almost","let","above","girl","sometimes","mountains","cut","young","talk","soon","list","song","being","leave","family","body",
+  "music","color","stand","sun","questions","fish","area","mark","dog","horse","birds","problem","complete","room","knew","since","ever","piece","told","usually",
+  "didn’t","friends","easy","heard","order","red","door","sure","become","top","ship","across","today","during","short","better","best","however","low",
+  // Fifth 100
+  "hours","black","products","happened","whole","measure","remember","early","waves","reached","listen","wind","rock","space","covered","fast","several","hold","himself","toward",
+  "five","step","morning","passed","vowel","true","hundred","against","pattern","numeral","table","north","slowly","money","map","farm","pulled","draw","voice","seen",
+  "cold","cried","plan","notice","south","sing","war","ground","fall","king","town","I’ll","unit","figure","certain","field","travel","wood","fire","upon",
+  "done","English","road","half","ten","fly","gave","box","finally","wait","correct","oh","quickly","person","became","shown","minutes","strong","verb","stars",
+  // Sixth 100
+  "front","feel","fact","inches","street","decided","contain","course","surface","produce","building","ocean","class","note","nothing","rest","carefully","scientists","inside","wheels",
+  "stay","green","known","island","week","less","machine","base","ago","stood","plane","system","behind","ran","round","boat","game","force","brought","understand",
+  "warm","common","bring","explain","dry","though","language","shape","deep","thousands","yes","clear","equation","yet","government","filled","heat","full","hot","check",
+  "object","am","rule","among","noun","power","cannot","able","six","size","dark","ball","material","special","heavy","fine","pair","circle","include","built",
+  "can’t","matter","square","syllables","perhaps","bill","felt","suddenly","test","direction","center","farmers","ready","anything","divided","general","energy","subject","Europe","moon",
+  "region","return","believe","dance","members","picked","simple","cells","paint","mind","love","cause","rain","exercise","eggs","train","blue","wish","drop","developed",
+  "window","difference","distance","heart","site","sum","summer","wall","forest","probably","legs","sat","main","winter","wide","written","length","reason","kept","interest",
+  "arms","brother","race","present","beautiful","store","job","edge","past","sign","record","finished","discovered","wild","happy","beside","gone","sky","million","west",
+  "lay","weather","root","instruments","meet","third","months","paragraph","raised","represent"
+];
+
+/* Hand-curated starter sentences (kept; we’ll add auto-generated below) */
+const CURATED = [
+  {answer:"but", textBefore:"He ran fast", textAfter:"fell down."},
+  {answer:"world", textBefore:"We learn about the", textAfter:"."},
+  {answer:"give", textBefore:"", textAfter:"me five!"},
+  {answer:"it", textBefore:"", textAfter:"is time to go."},
+  {answer:"through", textBefore:"Walk", textAfter:"the tunnel."},
+  {answer:"before", textBefore:"Brush teeth", textAfter:"bed."},
+  {answer:"keep", textBefore:"Please", textAfter:"trying."},
+  {answer:"during", textBefore:"No talking", textAfter:"the test."},
+  {answer:"both", textBefore:"", textAfter:"hands on the rail."},
+  {answer:"from", textBefore:"We walked home", textAfter:"school."},
+  {answer:"our", textBefore:"We love", textAfter:"school."},
+  {answer:"page", textBefore:"Turn the", textAfter:"."},
+  {answer:"up", textBefore:"Climb", textAfter:"the ladder."},
+  {answer:"low", textBefore:"Keep the sound", textAfter:"."},
+  {answer:"over", textBefore:"Jump", textAfter:"the puddle."},
+  {answer:"our", textBefore:"", textAfter:"class won a prize."},
+  {answer:"see", textBefore:"Can you", textAfter:"the rainbow?"},
+  {answer:"page", textBefore:"Find the", textAfter:"with the picture."},
+  {answer:"may", textBefore:"", textAfter:"I have a snack?"},
+  {answer:"their", textBefore:"", textAfter:"team played well."},
+  {answer:"before", textBefore:"Wash hands", textAfter:"dinner."},
+  {answer:"room", textBefore:"The", textAfter:"is quiet."},
+  {answer:"may", textBefore:"You", textAfter:"go outside."},
+  {answer:"give", textBefore:"Please", textAfter:"the note to Mom."},
+  {answer:"on", textBefore:"Keep your hands", textAfter:"the rail."},
+  {answer:"great", textBefore:"You made a", textAfter:"choice."},
+  {answer:"horse", textBefore:"The", textAfter:"runs fast."},
+  {answer:"hand", textBefore:"Raise your", textAfter:"."},
+  {answer:"read", textBefore:"We", textAfter:"together every night."},
+  {answer:"sun", textBefore:"Do not look at the", textAfter:"."},
+  {answer:"during", textBefore:"Be quiet", textAfter:"the show."},
+  {answer:"home", textBefore:"I like to be at", textAfter:"."},
+  {answer:"these", textBefore:"Put", textAfter:"papers away."},
+  {answer:"from", textBefore:"This note is", textAfter:"Mom."},
+  {answer:"to", textBefore:"Go", textAfter:"the library."},
+  {answer:"he", textBefore:"", textAfter:"is my brother."},
+  {answer:"low", textBefore:"The cloud is", textAfter:"."},
+  {answer:"start", textBefore:"", textAfter:"the game."},
+  {answer:"story", textBefore:"Read the", textAfter:"out loud."},
+  {answer:"table", textBefore:"We eat at the", textAfter:"."},
+  {answer:"was", textBefore:"It", textAfter:"sunny yesterday."},
+  {answer:"music", textBefore:"The", textAfter:"is very soft."},
+  {answer:"letter", textBefore:"Write one", textAfter:"here."},
+  {answer:"mother", textBefore:"My", textAfter:"reads to me."},
+  {answer:"i", textBefore:"", textAfter:"am your friend."},
+  {answer:"early", textBefore:"It is", textAfter:"in the morning."},
+  {answer:"little", textBefore:"He has a", textAfter:"car."},
+  {answer:"should", textBefore:"You", textAfter:"say thank you."},
+  {answer:"an", textBefore:"He ate", textAfter:"apple at lunch."},
+  {answer:"after", textBefore:"We will play", textAfter:"lunch."},
+  {answer:"or", textBefore:"Should we read now", textAfter:"later?"},
+  {answer:"father", textBefore:"I went with my", textAfter:"to the store."},
+  {answer:"in", textBefore:"We sit", textAfter:"the shade."},
+  {answer:"friend", textBefore:"My", textAfter:"is kind."},
+  {answer:"white", textBefore:"I saw a", textAfter:"bird."},
+  {answer:"above", textBefore:"The plane flew", textAfter:"the city."},
+  {answer:"tell", textBefore:"", textAfter:"me your idea."},
+  {answer:"us", textBefore:"Read to", textAfter:"tonight."},
+  {answer:"you", textBefore:"", textAfter:"can try again."},
+  {answer:"his", textBefore:"", textAfter:"hat is red."},
+  {answer:"off", textBefore:"Take", textAfter:"your shoes."},
+  {answer:"little", textBefore:"The", textAfter:"bird can fly."},
+  {answer:"make", textBefore:"Let’s", textAfter:"a card for Grandpa."},
+  {answer:"it", textBefore:"", textAfter:"looks sunny today."},
+  {answer:"other", textBefore:"Use the", textAfter:"marker."},
+  {answer:"friend", textBefore:"I will help my", textAfter:"."},
+  {answer:"write", textBefore:"", textAfter:"your name."},
+  {answer:"come", textBefore:"Can you", textAfter:"to my desk?"},
+  {answer:"if", textBefore:"", textAfter:"it rains, we will stay in."},
+  {answer:"its", textBefore:"The dog wagged", textAfter:"tail."},
+  {answer:"we", textBefore:"", textAfter:"are ready to start."},
+  {answer:"story", textBefore:"That", textAfter:"is funny."},
+  {answer:"door", textBefore:"Please open the", textAfter:"."},
+  {answer:"learn", textBefore:"", textAfter:"to spell this word."},
+  {answer:"find", textBefore:"Can you", textAfter:"the page?"},
+  {answer:"boy", textBefore:"The", textAfter:"kicks the ball."},
+  {answer:"me", textBefore:"Please help", textAfter:"."},
+  {answer:"best", textBefore:"You are my", textAfter:"friend."},
+  {answer:"door", textBefore:"Close the", textAfter:"softly."},
+  {answer:"hand", textBefore:"Wash your", textAfter:"before lunch."},
+  {answer:"city", textBefore:"The", textAfter:"is very big."},
+  {answer:"more", textBefore:"I want", textAfter:"water."},
+  {answer:"red", textBefore:"She has a", textAfter:"ball."},
+  {answer:"car", textBefore:"Get in the", textAfter:"."},
+  {answer:"am", textBefore:"I", textAfter:"ready to read."},
+  {answer:"but", textBefore:"I want to play", textAfter:"it is late."},
+  {answer:"run", textBefore:"I like to", textAfter:"fast."},
+  {answer:"color", textBefore:"Blue is my favorite", textAfter:"."},
+  {answer:"world", textBefore:"The", textAfter:"is big."},
+  {answer:"plant", textBefore:"A new", textAfter:"is growing."},
+  {answer:"ask", textBefore:"You can", textAfter:"for help."},
+  {answer:"carry", textBefore:"Can you", textAfter:"this bag?"},
+  {answer:"each", textBefore:"", textAfter:"child gets a turn."},
+  {answer:"near", textBefore:"We live", textAfter:"the park."},
+  {answer:"we", textBefore:"", textAfter:"will clean up."},
+  {answer:"make", textBefore:"We", textAfter:"a big tower."},
+  {answer:"must", textBefore:"You", textAfter:"wear a helmet."},
+  {answer:"another", textBefore:"Please pick", textAfter:"book."},
+  {answer:"some", textBefore:"I need", textAfter:"help."},
+  {answer:"around", textBefore:"Run", textAfter:"the cones."},
+  {answer:"below", textBefore:"The fish swim", textAfter:"the dock."},
+  {answer:"follow", textBefore:"Please", textAfter:"the rules."},
+  {answer:"few", textBefore:"A", textAfter:"kids were absent."},
+  {answer:"my", textBefore:"", textAfter:"shoes light up."},
+  {answer:"the", textBefore:"I saw", textAfter:"moon last night."},
+  {answer:"are", textBefore:"You", textAfter:"very kind."},
+  {answer:"river", textBefore:"The", textAfter:"is wide."},
+  {answer:"write", textBefore:"Can you", textAfter:"a sentence?"},
+  {answer:"try", textBefore:"Let’s", textAfter:"this one."},
+  {answer:"close", textBefore:"Please", textAfter:"your eyes."},
+  {answer:"bring", textBefore:"", textAfter:"your book to class."},
+  {answer:"get", textBefore:"I will", textAfter:"my pencil."},
+  {answer:"high", textBefore:"We climbed the", textAfter:"hill."},
+  {answer:"should", textBefore:"We", textAfter:"start now."},
+  {answer:"own", textBefore:"Bring your", textAfter:"pencil."},
+  {answer:"black", textBefore:"The cat is", textAfter:"."},
+  {answer:"my", textBefore:"", textAfter:"backpack is blue."},
+  {answer:"each", textBefore:"Read", textAfter:"word slowly."},
+  {answer:"short", textBefore:"It is a", textAfter:"line."},
+  {answer:"school", textBefore:"Walk to", textAfter:"with me."},
+  {answer:"change", textBefore:"The leaves", textAfter:"color."},
+  {answer:"book", textBefore:"This", textAfter:"is new."},
+  {answer:"so", textBefore:"It is late,", textAfter:"we will go home."},
+  {answer:"on", textBefore:"The book is", textAfter:"the table."},
+  {answer:"was", textBefore:"The game", textAfter:"fun."},
+  {answer:"own", textBefore:"I built my", textAfter:"tower."},
+  {answer:"in", textBefore:"Put the toy", textAfter:"the box."},
+  {answer:"every", textBefore:"We practice", textAfter:"day."},
+  {answer:"white", textBefore:"The snow is", textAfter:"."},
+  {answer:"i", textBefore:"", textAfter:"like to read."},
+  {answer:"them", textBefore:"I met", textAfter:"at the playground."},
+  {answer:"at", textBefore:"Meet me", textAfter:"the park."},
+  {answer:"birds", textBefore:"I see two", textAfter:"in the sky."},
+  {answer:"better", textBefore:"This plan is", textAfter:"."},
+  {answer:"family", textBefore:"I love my", textAfter:"."},
+  {answer:"before", textBefore:"Pack your bag", textAfter:"school."},
+  {answer:"paper", textBefore:"Write your name on the", textAfter:"."},
+  {answer:"her", textBefore:"Hold", textAfter:"hand."},
+  {answer:"around", textBefore:"We walked", textAfter:"the block."},
+  {answer:"he", textBefore:"", textAfter:"likes to run."},
+  {answer:"no", textBefore:"There is", textAfter:"time to waste."},
+  {answer:"change", textBefore:"", textAfter:"your seat."},
+  {answer:"after", textBefore:"Wash hands", textAfter:"play."},
+  {answer:"am", textBefore:"I", textAfter:"six years old."},
+  {answer:"mother", textBefore:"I hugged my", textAfter:"."},
+  {answer:"when", textBefore:"We line up", textAfter:"the bell rings."},
+  {answer:"high", textBefore:"The kite is", textAfter:"."},
+  {answer:"below", textBefore:"The house sits", textAfter:"the hill."},
+  {answer:"go", textBefore:"Ready, set,", textAfter:"!"},
+  {answer:"to", textBefore:"Give the ball", textAfter:"Sam."},
+  {answer:"you", textBefore:"", textAfter:"are very kind."},
+  {answer:"out", textBefore:"Take the trash", textAfter:"."},
+  {answer:"or", textBefore:"Do you want milk", textAfter:"water?"},
+  {answer:"good", textBefore:"That is a", textAfter:"idea."},
+  {answer:"look", textBefore:"", textAfter:"both ways before crossing."},
+  {answer:"us", textBefore:"Come with", textAfter:"."},
+  {answer:"when", textBefore:"Clap", textAfter:"the song ends."},
+  {answer:"through", textBefore:"Look", textAfter:"the window."},
+  {answer:"play", textBefore:"Can you", textAfter:"with me?"},
+  {answer:"point", textBefore:"Please", textAfter:"to the map."},
+  {answer:"another", textBefore:"Can I have", textAfter:"turn?"},
+  {answer:"until", textBefore:"Wait here", textAfter:"the light turns green."},
+  {answer:"real", textBefore:"Is the coin", textAfter:"?"},
+  {answer:"table", textBefore:"Put the crayons on the", textAfter:"."},
+  {answer:"is", textBefore:"The soup", textAfter:"hot."},
+  {answer:"girl", textBefore:"The", textAfter:"is reading."},
+  {answer:"him", textBefore:"I saw", textAfter:"at school."},
+  {answer:"several", textBefore:"She has", textAfter:"stickers."},
+  {answer:"red", textBefore:"The door is", textAfter:"."},
+  {answer:"off", textBefore:"Turn", textAfter:"the light."},
+  {answer:"they", textBefore:"", textAfter:"will come later."},
+  {answer:"most", textBefore:"I finished", textAfter:"of it."},
+  {answer:"so", textBefore:"It rained,", textAfter:"we stayed in."},
+  {answer:"read", textBefore:"Please", textAfter:"the book."},
+  {answer:"an", textBefore:"We saw", textAfter:"owl at the zoo."},
+  {answer:"night", textBefore:"At", textAfter:"the stars come out."},
+  {answer:"him", textBefore:"Give the ball to", textAfter:"."},
+  {answer:"learn", textBefore:"We will", textAfter:"new things."},
+  {answer:"until", textBefore:"We will stay", textAfter:"noon."},
+  {answer:"great", textBefore:"It was a", textAfter:"game."},
+  {answer:"country", textBefore:"Our", textAfter:"has many cities."},
+  {answer:"long", textBefore:"Read the", textAfter:"story."},
+  {answer:"grow", textBefore:"Children", textAfter:"each year."},
+  {answer:"under", textBefore:"We sat", textAfter:"the tree."},
+  {answer:"walk", textBefore:"Let’s", textAfter:"to class."},
+  {answer:"ask", textBefore:"", textAfter:"a question."},
+  {answer:"find", textBefore:"Let’s", textAfter:"your shoes."},
+  {answer:"across", textBefore:"Look both ways", textAfter:"the street."},
+  {answer:"she", textBefore:"", textAfter:"is my sister."},
+  {answer:"fish", textBefore:"We fed the", textAfter:"."},
+  {answer:"if", textBefore:"We can go", textAfter:"you are ready."},
+  {answer:"must", textBefore:"We", textAfter:"stop at the light."},
+  {answer:"any", textBefore:"Are there", textAfter:"snacks left?"},
+  {answer:"out", textBefore:"We went", textAfter:"to play."},
+  {answer:"walk", textBefore:"We", textAfter:"across the field."},
+  {answer:"while", textBefore:"Sit still", textAfter:"I count."},
+  {answer:"his", textBefore:"That is", textAfter:"book."},
+  {answer:"dog", textBefore:"The", textAfter:"barked loudly."},
+  {answer:"your", textBefore:"", textAfter:"coat is on the hook."},
+  {answer:"help", textBefore:"Please", textAfter:"me zip this."},
+  {answer:"any", textBefore:"Do you have", textAfter:"tape?"},
+  {answer:"big", textBefore:"We saw a", textAfter:"tree."},
+  {answer:"come", textBefore:"Please", textAfter:"here."},
+  {answer:"young", textBefore:"The", textAfter:"boy is six."},
+  {answer:"the", textBefore:"Please pass", textAfter:"salt."},
+  {answer:"into", textBefore:"Step", textAfter:"the circle."},
+  {answer:"after", textBefore:"We rest", textAfter:"lunch."},
+  {answer:"both", textBefore:"", textAfter:"teams played well."},
+  {answer:"with", textBefore:"I will go", textAfter:"my friend."},
+  {answer:"short", textBefore:"This is a", textAfter:"note."},
+  {answer:"between", textBefore:"The ball rolled", textAfter:"two boxes."},
+  {answer:"group", textBefore:"Join the", textAfter:"over there."},
+  {answer:"over", textBefore:"The kite flew", textAfter:"the trees."},
+  {answer:"children", textBefore:"The", textAfter:"are playing tag."},
+  {answer:"get", textBefore:"", textAfter:"your coat."},
+  {answer:"that", textBefore:"Do you see", textAfter:"star?"},
+  {answer:"children", textBefore:"The", textAfter:"lined up."},
+  {answer:"home", textBefore:"We are going", textAfter:"."},
+  {answer:"their", textBefore:"", textAfter:"house is on this street."},
+  {answer:"music", textBefore:"I like to dance to the", textAfter:"."},
+  {answer:"see", textBefore:"I", textAfter:"a bird."},
+  {answer:"no", textBefore:"We have", textAfter:"homework today."},
+  {answer:"fast", textBefore:"That car is", textAfter:"."},
+  {answer:"those", textBefore:"", textAfter:"shoes are mine."},
+  {answer:"though", textBefore:"We played,", textAfter:"it was cold."},
+  {answer:"play", textBefore:"We will", textAfter:"the game."},
+  {answer:"letter", textBefore:"What", textAfter:"comes next?"},
+  {answer:"horse", textBefore:"We saw a", textAfter:"at the farm."},
+  {answer:"move", textBefore:"", textAfter:"your piece forward."},
+  {answer:"earth", textBefore:"We live on the", textAfter:"."},
+  {answer:"toward", textBefore:"Run", textAfter:"the finish line."},
+  {answer:"tree", textBefore:"The", textAfter:"is tall."},
+  {answer:"wait", textBefore:"Please", textAfter:"your turn."},
+  {answer:"room", textBefore:"Clean your", textAfter:", please."},
+  {answer:"fast", textBefore:"He is a", textAfter:"runner."},
+  {answer:"color", textBefore:"What", textAfter:"is your bike?"},
+  {answer:"under", textBefore:"The cat hid", textAfter:"the bed."},
+  {answer:"though", textBefore:"I tried,", textAfter:"it was hard."},
+  {answer:"them", textBefore:"We waved to", textAfter:"."},
+  {answer:"country", textBefore:"This", textAfter:"is far away."},
+  {answer:"wait", textBefore:"", textAfter:"for the light."},
+  {answer:"by", textBefore:"I live", textAfter:"the lake."},
+  {answer:"will", textBefore:"We", textAfter:"read after lunch."},
+  {answer:"this", textBefore:"I like", textAfter:"game."},
+  {answer:"a", textBefore:"She found", textAfter:"coin on the floor."},
+  {answer:"those", textBefore:"I drew", textAfter:"pictures."},
+  {answer:"several", textBefore:"We tried", textAfter:"times."},
+  {answer:"were", textBefore:"We", textAfter:"at the park."},
+  {answer:"carry", textBefore:"", textAfter:"the box carefully."},
+  {answer:"near", textBefore:"Sit", textAfter:"your friends."},
+  {answer:"grow", textBefore:"Plants", textAfter:"in the sun."},
+  {answer:"this", textBefore:"", textAfter:"book is new."},
+  {answer:"start", textBefore:"We will", textAfter:"after lunch."},
+  {answer:"more", textBefore:"We need", textAfter:"time."},
+  {answer:"boy", textBefore:"That", textAfter:"is my friend."},
+  {answer:"many", textBefore:"", textAfter:"people helped clean."},
+  {answer:"while", textBefore:"Read quietly", textAfter:"we wait."},
+  {answer:"other", textBefore:"Try the", textAfter:"puzzle."},
+  {answer:"and", textBefore:"We read", textAfter:"we write."},
+  {answer:"night", textBefore:"Good", textAfter:", sleep well."},
+  {answer:"fish", textBefore:"The", textAfter:"swims in the pond."},
+  {answer:"many", textBefore:"We read", textAfter:"books."},
+  {answer:"her", textBefore:"", textAfter:"bike is fast."},
+  {answer:"across", textBefore:"We ran", textAfter:"the yard."},
+  {answer:"old", textBefore:"We live in an", textAfter:"house."},
+  {answer:"book", textBefore:"Pick a", textAfter:"to read."},
+  {answer:"new", textBefore:"I got a", textAfter:"backpack."},
+  {answer:"long", textBefore:"It is a", textAfter:"road."},
+  {answer:"show", textBefore:"Please", textAfter:"us the answer."},
+  {answer:"real", textBefore:"This is a", textAfter:"story."},
+  {answer:"best", textBefore:"That was the", textAfter:"part."},
+  {answer:"me", textBefore:"Give it to", textAfter:"."},
+  {answer:"her", textBefore:"Please sit with", textAfter:"."},
+  {answer:"will", textBefore:"I", textAfter:"help you."},
+  {answer:"big", textBefore:"The dog is", textAfter:"."},
+  {answer:"such", textBefore:"We had", textAfter:"a good time."},
+  {answer:"try", textBefore:"", textAfter:"again."},
+  {answer:"the", textBefore:"", textAfter:"dog ran to the gate."},
+  {answer:"day", textBefore:"We had a fun", textAfter:"."},
+  {answer:"small", textBefore:"The cat is", textAfter:"."},
+  {answer:"paper", textBefore:"Fold the", textAfter:"in half."},
+  {answer:"old", textBefore:"That is an", textAfter:"car."},
+  {answer:"look", textBefore:"", textAfter:"at the board."},
+  {answer:"early", textBefore:"We arrived", textAfter:"."},
+  {answer:"school", textBefore:"I like my", textAfter:"."},
+  {answer:"by", textBefore:"Stand", textAfter:"the window."},
+  {answer:"tell", textBefore:"Can you", textAfter:"a story?"},
+  {answer:"water", textBefore:"The", textAfter:"is cold."},
+  {answer:"happy", textBefore:"She is", textAfter:"."},
+  {answer:"into", textBefore:"Pour water", textAfter:"the cup."},
+  {answer:"because", textBefore:"I smiled", textAfter:"it was your turn."},
+  {answer:"at", textBefore:"We are", textAfter:"the door."},
+  {answer:"plant", textBefore:"The", textAfter:"needs water."},
+  {answer:"toward", textBefore:"Walk", textAfter:"the door."},
+  {answer:"follow", textBefore:"", textAfter:"the line."},
+  {answer:"that", textBefore:"", textAfter:"dog is friendly."},
+  {answer:"few", textBefore:"I have a", textAfter:"coins."},
+  {answer:"small", textBefore:"This is a", textAfter:"bug."},
+  {answer:"girl", textBefore:"That", textAfter:"is kind."},
+  {answer:"birds", textBefore:"The", textAfter:"sing in the tree."},
+  {answer:"spell", textBefore:"Can you", textAfter:"your name?"},
+  {answer:"move", textBefore:"Please", textAfter:"your chair."},
+  {answer:"could", textBefore:"She", textAfter:"finish the puzzle."},
+  {answer:"open", textBefore:"", textAfter:"your book to page two."},
+  {answer:"keep", textBefore:"", textAfter:"your hands on the rail."},
+  {answer:"its", textBefore:"The car lost", textAfter:"wheel."},
+  {answer:"happy", textBefore:"We had a", textAfter:"day."},
+  {answer:"help", textBefore:"Can you", textAfter:"your friend?"},
+  {answer:"new", textBefore:"This is a", textAfter:"book."},
+  {answer:"city", textBefore:"We live in a busy", textAfter:"."},
+  {answer:"father", textBefore:"My", textAfter:"is cooking dinner."},
+  {answer:"a", textBefore:"I saw", textAfter:"bird in the tree."},
+  {answer:"good", textBefore:"You did a", textAfter:"job."},
+  {answer:"after", textBefore:"Read a book", textAfter:"dinner."},
+  {answer:"go", textBefore:"We", textAfter:"to the library."},
+  {answer:"up", textBefore:"Look", textAfter:"at the sky."},
+  {answer:"her", textBefore:"I heard", textAfter:"sing."},
+  {answer:"young", textBefore:"They are still", textAfter:"."},
+  {answer:"with", textBefore:"Cut the paper", textAfter:"scissors."},
+  {answer:"most", textBefore:"", textAfter:"kids were ready."},
+  {answer:"and", textBefore:"I like cats", textAfter:"dogs."},
+  {answer:"same", textBefore:"We have the", textAfter:"shoes."},
+  {answer:"water", textBefore:"Drink your", textAfter:"after play."},
+  {answer:"might", textBefore:"We", textAfter:"see rain today."},
+  {answer:"because", textBefore:"We stayed inside", textAfter:"it rained."},
+  {answer:"could", textBefore:"I", textAfter:"see the moon."},
+  {answer:"black", textBefore:"He wore a", textAfter:"hat."},
+  {answer:"spell", textBefore:"Please", textAfter:"the word."},
+  {answer:"is", textBefore:"My bag", textAfter:"heavy."},
+  {answer:"can", textBefore:"We", textAfter:"share the toys."},
+  {answer:"between", textBefore:"Put the cone", textAfter:"the chairs."},
+  {answer:"earth", textBefore:"The", textAfter:"goes around the sun."},
+  {answer:"every", textBefore:"", textAfter:"seat is taken."},
+  {answer:"family", textBefore:"My", textAfter:"eats dinner together."},
+  {answer:"river", textBefore:"We crossed the", textAfter:"."},
+  {answer:"better", textBefore:"I feel", textAfter:"today."},
+  {answer:"are", textBefore:"We", textAfter:"on time."},
+  {answer:"can", textBefore:"I", textAfter:"ride my bike."},
+  {answer:"point", textBefore:"Find the high", textAfter:"on the line."},
+  {answer:"tree", textBefore:"The bird sits in the", textAfter:"."},
+  {answer:"run", textBefore:"We will", textAfter:"to the park."},
+  {answer:"close", textBefore:"", textAfter:"the door softly."},
+  {answer:"sun", textBefore:"The", textAfter:"is bright."},
+  {answer:"bring", textBefore:"Please", textAfter:"a pencil."},
+  {answer:"your", textBefore:"Wash", textAfter:"hands."},
+  {answer:"these", textBefore:"", textAfter:"blocks are heavy."},
+  {answer:"open", textBefore:"", textAfter:"the door."},
+  {answer:"group", textBefore:"Our", textAfter:"works together."},
+  {answer:"above", textBefore:"The sun is", textAfter:"the clouds."},
+  {answer:"she", textBefore:"", textAfter:"loves to draw."},
+  {answer:"day", textBefore:"It is a sunny", textAfter:"."},
+  {answer:"they", textBefore:"", textAfter:"are at the park."},
+  {answer:"might", textBefore:"He", textAfter:"come later."},
+  {answer:"dog", textBefore:"I walked the", textAfter:"."},
+  {answer:"some", textBefore:"We have", textAfter:"markers."},
+  {answer:"same", textBefore:"Read the", textAfter:"page again."},
+  {answer:"show", textBefore:"", textAfter:"me your drawing."},
+  {answer:"car", textBefore:"The", textAfter:"is red."},
+  {answer:"such", textBefore:"It was", textAfter:"a fun day."},
+  {answer:"were", textBefore:"They", textAfter:"very happy."}
+];
+
+const SENTENCES = CURATED;
+
+
+
+/* ---------------- State & Storage ------------------ */
+const LS_STATE = 'l2r_state_v2';
+const LS_METRIC = 'l2r_metrics_v1';
+
+let order = [];           // shuffled indexes for SENTENCES
+let idx = 0;              // current position
+let scoreCorrect = 0;
+let scoreIncorrect = 0;
+let countedThisCard = false;
+
+const metrics = loadMetrics(); // { startedAt, totalMs, words:{[word]:{attempts, firstWrong, firstTryCorrect}} , review:Set }
+let sessionStart = Date.now();
+
+/* Elements */
+const $sentence = document.getElementById('sentence');
+const $message  = document.getElementById('message');
+const $progress = document.getElementById('progress');
+const $chips    = document.getElementById('chips');
+const $grade    = document.getElementById('gradeBtn');
+const $next     = document.getElementById('nextBtn');
+const $reveal   = document.getElementById('revealBtn');
+const $reset    = document.getElementById('resetBtn');
+const $newGame  = document.getElementById('newGameBtn');
+const $scC      = document.getElementById('scoreCorrect');
+const $scI      = document.getElementById('scoreIncorrect');
+const $confetti = document.getElementById('confetti');
+const $revealToggle = document.getElementById('revealToggle');
+const $dashboardBtn = document.getElementById('dashboardBtn');
+const $modalBackdrop = document.getElementById('modalBackdrop');
+const $closeModal = document.getElementById('closeModal');
+const $timeOnTask = document.getElementById('timeOnTask');
+const $accTableBody = document.querySelector('#accuracyTable tbody');
+const $reviewList = document.getElementById('reviewList');
+
+/* Utils */
+const shuffle = a => { for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
+function save(){
+  localStorage.setItem(LS_STATE, JSON.stringify({order, idx, scoreCorrect, scoreIncorrect}));
+  saveMetrics();
+}
+function load(){
+  const raw = localStorage.getItem(LS_STATE);
+  if(!raw) return false;
+  try{
+    const s = JSON.parse(raw);
+    if(!Array.isArray(s.order) || typeof s.idx!=='number') return false;
+    order = s.order; idx = s.idx; scoreCorrect = s.scoreCorrect||0; scoreIncorrect = s.scoreIncorrect||0;
+    return true;
+  }catch{ return false; }
+}
+function resetAll(){
+  order = shuffle([...Array(SENTENCES.length).keys()]);
+  idx = 0; scoreCorrect = 0; scoreIncorrect = 0;
+  save();
+}
+
+/* Metrics */
+function loadMetrics(){
+  const raw = localStorage.getItem(LS_METRIC);
+  if(!raw){
+    return { startedAt: Date.now(), totalMs: 0, words:{}, review:{} };
+  }
+  try{
+    const m = JSON.parse(raw);
+    if (!m.words) m.words = {};
+    if (!m.review) m.review = {};
+    if (!m.startedAt) m.startedAt = Date.now();
+    if (typeof m.totalMs !== 'number') m.totalMs = 0;
+    return m;
+  } catch {
+    return { startedAt: Date.now(), totalMs: 0, words:{}, review:{} };
+  }
+}
+function saveMetrics(){
+  localStorage.setItem(LS_METRIC, JSON.stringify(metrics));
+}
+function addTime(){
+  const now = Date.now();
+  metrics.totalMs += (now - sessionStart);
+  sessionStart = now;
+  saveMetrics();
+}
+window.addEventListener('beforeunload', addTime);
+
+/* Confetti */
+const confetti = (() => {
+  const cv = $confetti;
+  const ctx = cv.getContext('2d');
+  let parts = [], timer;
+  const resize = () => { cv.width = cv.clientWidth; cv.height = cv.clientHeight; };
+  window.addEventListener('resize', resize); resize();
+  function burst(){
+    parts = Array.from({length:60}).map(() => ({
+      x: cv.width/2, y: cv.height/3, vx:(Math.random()-0.5)*6, vy:Math.random()*-6-2,
+      r: Math.random()*3+2, a:1, vr: (Math.random()-0.5)*0.2
+    }));
+    if(timer) cancelAnimationFrame(timer);
+    loop();
+  }
+  function loop(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    parts.forEach(p=>{
+      p.vy += 0.15; p.x += p.vx; p.y += p.vy; p.a -= 0.01; p.r += p.vr;
+      ctx.globalAlpha = Math.max(p.a,0);
+      ctx.beginPath(); ctx.arc(p.x,p.y,Math.max(p.r,0),0,Math.PI*2); ctx.fillStyle = '#'+(~~(Math.random()*0xFFFFFF)).toString(16).padStart(6,'0'); ctx.fill();
+    });
+    parts = parts.filter(p=>p.a>0 && p.y < cv.height+20);
+    if(parts.length) timer = requestAnimationFrame(loop);
+  }
+  return { burst };
+})();
+
+/* Render */
+function renderCard(){
+  $message.textContent = '';
+  $message.className = 'msg';
+  $next.style.display = 'none';
+  $reveal.style.display = 'inline-block';
+  countedThisCard = false;
+
+  // reveal chips reset
+  $chips.style.display = 'none';
+  $revealToggle.style.display = 'inline';
+  $revealToggle.textContent = 'Reveal';
+
+  if(idx >= order.length){
+    $sentence.innerHTML = `🎉 All done! You finished ${order.length} sentences. Press <b>New Game</b> to play again.`;
+    $progress.textContent = '';
+    $chips.innerHTML='';
+    $revealToggle.style.display = 'none';
+    return;
+  }
+
+  const s = SENTENCES[order[idx]];
+  const answer = s.answer.toLowerCase();
+  const letters = [...answer];
+
+  // Build letter tiles
+  const blank = document.createElement('span'); blank.className = 'blank';
+  blank.setAttribute('role','group'); blank.setAttribute('aria-label','Type the missing word');
+  letters.forEach((_,i)=>{
+    const input = document.createElement('input');
+    input.className = 'tile';
+    input.maxLength = 1;
+    input.inputMode = 'latin';
+    input.autocapitalize = 'none';
+    input.autocomplete = 'off';
+    input.spellcheck = 'false';
+    input.dataset.idx = i;
+    input.addEventListener('input', (e)=>{
+      e.target.value = e.target.value.replace(/[^a-zA-Z’']/g,'').toLowerCase();
+      const next = e.target.nextElementSibling;
+      if(e.target.value && next) next.focus();
+    });
+    input.addEventListener('keydown', (e)=>{
+      if(e.key==='Backspace' && !e.target.value){
+        const prev = e.target.previousElementSibling; if(prev){prev.focus(); prev.value='';}
+      }
+      if(e.key==='ArrowLeft'){ const prev = e.target.previousElementSibling; if(prev) prev.focus(); }
+      if(e.key==='ArrowRight'){ const next = e.target.nextElementSibling; if(next) next.focus(); }
+      if(e.key==='Enter'){ grade(); }
+    });
+    blank.appendChild(input);
+  });
+
+  $sentence.innerHTML='';
+  const pre = document.createTextNode(capitalIfNeeded(s.textBefore) + ' ');
+  const post = document.createTextNode((s.textAfter||''));
+  $sentence.appendChild(pre);
+  $sentence.appendChild(blank);
+  $sentence.appendChild(document.createTextNode(' '));
+  $sentence.appendChild(post);
+
+  $progress.textContent = `Card ${idx+1} of ${order.length}`;
+
+  $chips.innerHTML = '';
+  $chips.appendChild(chip(`Target word: ${answer}`));
+  $chips.appendChild(chip(`Letters: ${letters.length}`));
+
+  const first = blank.querySelector('.tile'); if(first) first.focus();
+
+  $scC.textContent = String(scoreCorrect);
+  $scI.textContent = String(scoreIncorrect);
+  save();
+}
+
+function capitalIfNeeded(text){
+  if(!text) return '';
+  const t = text.trimStart();
+  const cap = t.charAt(0).toUpperCase() + t.slice(1);
+  return text.replace(t, cap);
+}
+function chip(text){
+  const el = document.createElement('span');
+  el.className = 'chip';
+  el.textContent = text;
+  return el;
+}
+function getTypedWord(){
+  const tiles = [...document.querySelectorAll('.tile')];
+  return tiles.map(t=>t.value.toLowerCase()).join('');
+}
+
+/* Grade logic with metrics */
+function ensureWordMetric(word){
+  if(!metrics.words[word]) metrics.words[word] = { attempts:0, firstWrong:0, firstTryCorrect:0 };
+}
+function grade(){
+  if(idx >= order.length) return;
+  const s = SENTENCES[order[idx]];
+  const answer = s.answer.toLowerCase();
+  const typed = getTypedWord();
+
+  ensureWordMetric(answer);
+
+  if(!typed || typed.length !== answer.length){
+    $message.textContent = 'Keep going — fill all the boxes first.';
+    $message.className = 'msg';
+    return;
+  }
+
+  // Count attempt for metrics (first click on Grade per card is an attempt)
+  if (metrics.words[answer]._countedAttemptForIdx !== idx) {
+    metrics.words[answer].attempts += 1;
+    metrics.words[answer]._countedAttemptForIdx = idx;
+  }
+
+  if(typed === answer){
+    $message.textContent = '✅ Correct! Great job!';
+    $message.className = 'msg good';
+    // If this was the first attempt for this card, mark firstTryCorrect
+    if (!countedThisCard) {
+      metrics.words[answer].firstTryCorrect += 1;
+    }
+    scoreCorrect += 1;
+    $scC.textContent = String(scoreCorrect);
+    $next.style.display = 'inline-block';
+    $reveal.style.display = 'none';
+    confetti.burst();
+    saveMetrics();
+    save();
+  } else {
+    $message.textContent = '❌ Not quite. Try again!';
+    $message.className = 'msg bad';
+    if(!countedThisCard){
+      scoreIncorrect += 1;
+      countedThisCard = true;
+      $scI.textContent = String(scoreIncorrect);
+      metrics.words[answer].firstWrong += 1;
+      metrics.review[answer] = true;   // add to review set
+      saveMetrics();
+      save();
+    }
+  }
+}
+
+/* Hint */
+function revealHint(){
+  if(idx >= order.length) return;
+  const s = SENTENCES[order[idx]];
+  const letters = [...s.answer.toLowerCase()];
+  const tiles = [...document.querySelectorAll('.tile')];
+  for(let i=0;i<tiles.length;i++){
+    if(!tiles[i].value || tiles[i].value !== letters[i]){
+      tiles[i].value = letters[i];
+      tiles[i].focus();
+      break;
+    }
+  }
+}
+
+/* Next */
+function nextCard(){
+  if(idx < order.length){ idx += 1; }
+  renderCard();
+}
+
+/* Reveal toggle */
+$revealToggle.addEventListener('click', ()=>{
+  if ($chips.style.display === 'none'){
+    $chips.style.display = 'flex';
+    $revealToggle.textContent = 'Hide';
+  } else {
+    $chips.style.display = 'none';
+    $revealToggle.textContent = 'Reveal';
+  }
+});
+
+/* New Game & Reset */
+document.getElementById('newGameBtn').addEventListener('click', () => { resetAll(); renderCard(); });
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if(confirm('Reset game and clear your saved progress, scores, and metrics?')){
+    localStorage.removeItem(LS_STATE);
+    localStorage.removeItem(LS_METRIC);
+    Object.assign(metrics, { startedAt: Date.now(), totalMs: 0, words:{}, review:{} });
+    resetAll(); renderCard();
+  }
+});
+
+/* Buttons */
+$grade.addEventListener('click', grade);
+$next.addEventListener('click', nextCard);
+$reveal.addEventListener('click', revealHint);
+
+/* Dashboard */
+$dashboardBtn.addEventListener('click', openDashboard);
+$closeModal.addEventListener('click', closeDashboard);
+$modalBackdrop.addEventListener('click', (e)=>{ if(e.target === $modalBackdrop) closeDashboard(); });
+
+function openDashboard(){
+  addTime(); // flush time so far into totalMs
+  // Time on task
+  const mins = Math.round(metrics.totalMs / 60000);
+  $timeOnTask.textContent = `Time on task: ${mins} minute${mins===1?'':'s'}`;
+
+  // Build accuracy rows
+  const entries = Object.entries(metrics.words)
+    .filter(([w,obj]) => !w.startsWith('_')) // skip internal flags
+    .map(([w,obj]) => {
+      const attempts = obj.attempts || 0;
+      const firstTry = obj.firstTryCorrect || 0;
+      const pct = attempts ? Math.round((firstTry/attempts)*100) : 0;
+      return {word:w, attempts, pct};
+    })
+    .sort((a,b)=> a.word.localeCompare(b.word));
+
+  $accTableBody.innerHTML = entries.map(r =>
+    `<tr><td>${r.word}</td><td>${r.pct}%</td><td>${r.attempts}</td></tr>`
+  ).join('') || `<tr><td colspan="3">Play a bit to see stats.</td></tr>`;
+
+  // Review chips
+  const reviewWords = Object.keys(metrics.review||{}).sort();
+  $reviewList.innerHTML = reviewWords.length
+    ? reviewWords.map(w=>`<span class="chip">${w}</span>`).join('')
+    : '<span class="badge">No words to review yet 🎉</span>';
+
+  $modalBackdrop.style.display = 'flex';
+  $modalBackdrop.setAttribute('aria-hidden','false');
+}
+function closeDashboard(){
+  $modalBackdrop.style.display = 'none';
+  $modalBackdrop.setAttribute('aria-hidden','true');
+}
+
+/* Resume or start fresh */
+if(!load()){ resetAll(); }
+renderCard();
+</script>
+</body>
+</html>
